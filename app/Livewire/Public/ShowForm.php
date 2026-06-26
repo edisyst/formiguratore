@@ -11,7 +11,6 @@ class ShowForm extends Component
 {
     public Form $form;
 
-    // Modal state
     public bool $showModal = false;
     public ?int $editingElementId = null;
     public ?int $editingRecordId = null;
@@ -19,7 +18,7 @@ class ShowForm extends Component
 
     public function mount(Form $form): void
     {
-        $this->form = $form->load('steps.elements.objectRecords');
+        $this->form = $form->load('steps.groups.elements.objectRecords');
     }
 
     public function openModal(int $elementId, ?int $recordId = null): void
@@ -54,18 +53,18 @@ class ShowForm extends Component
         } else {
             ObjectRecord::create([
                 'element_id' => $this->editingElementId,
-                'data' => $this->modalData,
+                'data'       => $this->modalData,
             ]);
         }
 
         $this->closeModal();
-        $this->form = $this->form->fresh('steps.elements.objectRecords');
+        $this->form = $this->form->fresh('steps.groups.elements.objectRecords');
     }
 
     public function deleteRecord(int $recordId): void
     {
         ObjectRecord::find($recordId)?->delete();
-        $this->form = $this->form->fresh('steps.elements.objectRecords');
+        $this->form = $this->form->fresh('steps.groups.elements.objectRecords');
     }
 
     public function render()

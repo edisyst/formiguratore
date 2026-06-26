@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Element;
 use App\Models\Form;
+use App\Models\Group;
 use App\Models\Step;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -12,22 +13,19 @@ class FormBuilder extends Component
 {
     public ?Form $form = null;
 
-    // Form fields
     public string $name = '';
     public string $slug = '';
     public string $description = '';
 
-    // Steps state (array of step data)
+    // steps[si] = { id, title, order, groups[gi] = { id, title, header, footer, order, elements[ei] = {...} } }
     public array $steps = [];
 
-    // New step input
     public string $newStepTitle = '';
+    public array $newGroupTitle = []; // keyed by step index
+    public array $newElement = [];    // keyed by step index, then group index
 
-    // New element inputs per step (keyed by step index)
-    public array $newElement = [];
-
-    // Track which step accordion is open
     public array $openSteps = [];
+    public array $openGroups = []; // [si][gi]
 
     public function mount(?Form $form = null): void
     {
@@ -37,23 +35,36 @@ class FormBuilder extends Component
             $this->slug = $form->slug;
             $this->description = $form->description ?? '';
 
-            foreach ($form->steps as $i => $step) {
+            foreach ($form->steps as $si => $step) {
+                $groups = [];
+                foreach ($step->groups as $gi => $group) {
+                    $groups[] = [
+                        'id'       => $group->id,
+                        'title'    => $group->title,
+                        'header'   => $group->header ?? '',
+                        'footer'   => $group->footer ?? '',
+                        'order'    => $group->order,
+                        'elements' => $group->elements->map(fn($e) => [
+                            'id'            => $e->id,
+                            'name'          => $e->name,
+                            'type'          => $e->type,
+                            'label'         => $e->label,
+                            'placeholder'   => $e->placeholder ?? '',
+                            'required'      => $e->required,
+                            'order'         => $e->order,
+                            'configuration' => $e->configuration ?? [],
+                        ])->toArray(),
+                    ];
+                    $this->openGroups[$si][$gi] = true;
+                }
+
                 $this->steps[] = [
-                    'id' => $step->id,
-                    'title' => $step->title,
-                    'order' => $step->order,
-                    'elements' => $step->elements->map(fn($e) => [
-                        'id' => $e->id,
-                        'name' => $e->name,
-                        'type' => $e->type,
-                        'label' => $e->label,
-                        'placeholder' => $e->placeholder ?? '',
-                        'required' => $e->required,
-                        'order' => $e->order,
-                        'configuration' => $e->configuration ?? [],
-                    ])->toArray(),
+                    'id'     => $step->id,
+                    'title'  => $step->title,
+                    'order'  => $step->order,
+                    'groups' => $groups,
                 ];
-                $this->openSteps[$i] = true;
+                $this->openSteps[$si] = true;
             }
         }
     }
@@ -65,39 +76,41 @@ class FormBuilder extends Component
         }
     }
 
+    // ── Step management ──────────────────────────────────────────────────────
+
     public function addStep(): void
     {
         $title = trim($this->newStepTitle);
         if (!$title) return;
 
         $this->steps[] = [
-            'id' => null,
-            'title' => $title,
-            'order' => count($this->steps),
-            'elements' => [],
+            'id'     => null,
+            'title'  => $title,
+            'order'  => count($this->steps),
+            'groups' => [],
         ];
         $idx = count($this->steps) - 1;
         $this->openSteps[$idx] = true;
         $this->newStepTitle = '';
     }
 
-    public function removeStep(int $index): void
+    public function removeStep(int $si): void
     {
-        array_splice($this->steps, $index, 1);
+        array_splice($this->steps, $si, 1);
         $this->reorderSteps();
     }
 
-    public function moveStepUp(int $index): void
+    public function moveStepUp(int $si): void
     {
-        if ($index === 0) return;
-        [$this->steps[$index - 1], $this->steps[$index]] = [$this->steps[$index], $this->steps[$index - 1]];
+        if ($si === 0) return;
+        [$this->steps[$si - 1], $this->steps[$si]] = [$this->steps[$si], $this->steps[$si - 1]];
         $this->reorderSteps();
     }
 
-    public function moveStepDown(int $index): void
+    public function moveStepDown(int $si): void
     {
-        if ($index >= count($this->steps) - 1) return;
-        [$this->steps[$index], $this->steps[$index + 1]] = [$this->steps[$index + 1], $this->steps[$index]];
+        if ($si >= count($this->steps) - 1) return;
+        [$this->steps[$si], $this->steps[$si + 1]] = [$this->steps[$si + 1], $this->steps[$si]];
         $this->reorderSteps();
     }
 
@@ -108,11 +121,72 @@ class FormBuilder extends Component
         }
     }
 
-    public function addElement(int $stepIndex): void
+    public function toggleStep(int $si): void
     {
-        $data = $this->newElement[$stepIndex] ?? [];
-        $name = trim($data['name'] ?? '');
-        $type = $data['type'] ?? 'text';
+        $this->openSteps[$si] = !($this->openSteps[$si] ?? false);
+    }
+
+    // ── Group management ─────────────────────────────────────────────────────
+
+    public function addGroup(int $si): void
+    {
+        $title = trim($this->newGroupTitle[$si] ?? '');
+        if (!$title) return;
+
+        $gi = count($this->steps[$si]['groups']);
+        $this->steps[$si]['groups'][] = [
+            'id'       => null,
+            'title'    => $title,
+            'header'   => '',
+            'footer'   => '',
+            'order'    => $gi,
+            'elements' => [],
+        ];
+        $this->openGroups[$si][$gi] = true;
+        $this->newGroupTitle[$si] = '';
+    }
+
+    public function removeGroup(int $si, int $gi): void
+    {
+        array_splice($this->steps[$si]['groups'], $gi, 1);
+        $this->reorderGroups($si);
+    }
+
+    public function moveGroupUp(int $si, int $gi): void
+    {
+        if ($gi === 0) return;
+        $g = &$this->steps[$si]['groups'];
+        [$g[$gi - 1], $g[$gi]] = [$g[$gi], $g[$gi - 1]];
+        $this->reorderGroups($si);
+    }
+
+    public function moveGroupDown(int $si, int $gi): void
+    {
+        $g = &$this->steps[$si]['groups'];
+        if ($gi >= count($g) - 1) return;
+        [$g[$gi], $g[$gi + 1]] = [$g[$gi + 1], $g[$gi]];
+        $this->reorderGroups($si);
+    }
+
+    private function reorderGroups(int $si): void
+    {
+        foreach ($this->steps[$si]['groups'] as $i => &$group) {
+            $group['order'] = $i;
+        }
+    }
+
+    public function toggleGroup(int $si, int $gi): void
+    {
+        $this->openGroups[$si][$gi] = !($this->openGroups[$si][$gi] ?? false);
+    }
+
+    // ── Element management ───────────────────────────────────────────────────
+
+    public function addElement(int $si, int $gi): void
+    {
+        $data  = $this->newElement[$si][$gi] ?? [];
+        $name  = trim($data['name'] ?? '');
+        $type  = $data['type'] ?? 'text';
         $label = trim($data['label'] ?? '');
 
         if (!$name || !$label) return;
@@ -120,79 +194,81 @@ class FormBuilder extends Component
         $config = [];
         if ($type === 'select') {
             $raw = $data['options_raw'] ?? '';
-            $config['options'] = array_filter(array_map('trim', explode("\n", $raw)));
+            $config['options'] = array_values(array_filter(array_map('trim', explode("\n", $raw))));
         } elseif ($type === 'object') {
             $config['fields'] = $data['object_fields'] ?? [];
         }
 
-        $this->steps[$stepIndex]['elements'][] = [
-            'id' => null,
-            'name' => $name,
-            'type' => $type,
-            'label' => $label,
-            'placeholder' => $data['placeholder'] ?? '',
-            'required' => isset($data['required']) && $data['required'],
-            'order' => count($this->steps[$stepIndex]['elements']),
+        $this->steps[$si]['groups'][$gi]['elements'][] = [
+            'id'            => null,
+            'name'          => $name,
+            'type'          => $type,
+            'label'         => $label,
+            'placeholder'   => $data['placeholder'] ?? '',
+            'required'      => isset($data['required']) && $data['required'],
+            'order'         => count($this->steps[$si]['groups'][$gi]['elements']),
             'configuration' => $config,
         ];
 
-        $this->newElement[$stepIndex] = ['type' => 'text'];
+        $this->newElement[$si][$gi] = ['type' => 'text'];
     }
 
-    public function removeElement(int $stepIndex, int $elementIndex): void
+    public function removeElement(int $si, int $gi, int $ei): void
     {
-        array_splice($this->steps[$stepIndex]['elements'], $elementIndex, 1);
-        $this->reorderElements($stepIndex);
+        array_splice($this->steps[$si]['groups'][$gi]['elements'], $ei, 1);
+        $this->reorderElements($si, $gi);
     }
 
-    public function moveElementUp(int $stepIndex, int $elementIndex): void
+    public function moveElementUp(int $si, int $gi, int $ei): void
     {
-        if ($elementIndex === 0) return;
-        $els = &$this->steps[$stepIndex]['elements'];
-        [$els[$elementIndex - 1], $els[$elementIndex]] = [$els[$elementIndex], $els[$elementIndex - 1]];
-        $this->reorderElements($stepIndex);
+        if ($ei === 0) return;
+        $els = &$this->steps[$si]['groups'][$gi]['elements'];
+        [$els[$ei - 1], $els[$ei]] = [$els[$ei], $els[$ei - 1]];
+        $this->reorderElements($si, $gi);
     }
 
-    public function moveElementDown(int $stepIndex, int $elementIndex): void
+    public function moveElementDown(int $si, int $gi, int $ei): void
     {
-        $els = &$this->steps[$stepIndex]['elements'];
-        if ($elementIndex >= count($els) - 1) return;
-        [$els[$elementIndex], $els[$elementIndex + 1]] = [$els[$elementIndex + 1], $els[$elementIndex]];
-        $this->reorderElements($stepIndex);
+        $els = &$this->steps[$si]['groups'][$gi]['elements'];
+        if ($ei >= count($els) - 1) return;
+        [$els[$ei], $els[$ei + 1]] = [$els[$ei + 1], $els[$ei]];
+        $this->reorderElements($si, $gi);
     }
 
-    private function reorderElements(int $stepIndex): void
+    private function reorderElements(int $si, int $gi): void
     {
-        foreach ($this->steps[$stepIndex]['elements'] as $i => &$el) {
+        foreach ($this->steps[$si]['groups'][$gi]['elements'] as $i => &$el) {
             $el['order'] = $i;
         }
     }
 
-    public function addObjectField(int $stepIndex, int $elementIndex): void
+    public function addObjectField(int $si, int $gi, int $ei): void
     {
-        $field = $this->newElement[$stepIndex]['obj_field'] ?? [];
-        $fieldName = trim($field['name'] ?? '');
+        $field      = $this->newElement[$si][$gi]['obj_field'] ?? [];
+        $fieldName  = trim($field['name'] ?? '');
         $fieldLabel = trim($field['label'] ?? '');
         if (!$fieldName || !$fieldLabel) return;
 
-        $this->steps[$stepIndex]['elements'][$elementIndex]['configuration']['fields'][] = [
-            'name' => $fieldName,
-            'label' => $fieldLabel,
-            'type' => $field['type'] ?? 'text',
+        $this->steps[$si]['groups'][$gi]['elements'][$ei]['configuration']['fields'][] = [
+            'name'     => $fieldName,
+            'label'    => $fieldLabel,
+            'type'     => $field['type'] ?? 'text',
             'required' => isset($field['required']) && $field['required'],
         ];
 
-        $this->newElement[$stepIndex]['obj_field'] = [];
+        $this->newElement[$si][$gi]['obj_field'] = [];
     }
 
-    public function removeObjectField(int $stepIndex, int $elementIndex, int $fieldIndex): void
+    public function removeObjectField(int $si, int $gi, int $ei, int $fi): void
     {
         array_splice(
-            $this->steps[$stepIndex]['elements'][$elementIndex]['configuration']['fields'],
-            $fieldIndex,
+            $this->steps[$si]['groups'][$gi]['elements'][$ei]['configuration']['fields'],
+            $fi,
             1
         );
     }
+
+    // ── Persist ──────────────────────────────────────────────────────────────
 
     public function save(): void
     {
@@ -202,8 +278,8 @@ class FormBuilder extends Component
         ]);
 
         $formData = [
-            'name' => $this->name,
-            'slug' => $this->slug,
+            'name'        => $this->name,
+            'slug'        => $this->slug,
             'description' => $this->description,
         ];
 
@@ -214,57 +290,69 @@ class FormBuilder extends Component
             $form = Form::create($formData);
         }
 
-        // Sync steps
-        $existingStepIds = $form->steps()->pluck('id')->toArray();
         $savedStepIds = [];
 
-        foreach ($this->steps as $i => $stepData) {
+        foreach ($this->steps as $si => $stepData) {
             if ($stepData['id']) {
                 $step = Step::find($stepData['id']);
-                $step->update(['title' => $stepData['title'], 'order' => $i]);
+                $step->update(['title' => $stepData['title'], 'order' => $si]);
             } else {
-                $step = $form->steps()->create(['title' => $stepData['title'], 'order' => $i]);
+                $step = $form->steps()->create(['title' => $stepData['title'], 'order' => $si]);
             }
             $savedStepIds[] = $step->id;
 
-            // Sync elements
-            $existingElIds = $step->elements()->pluck('id')->toArray();
-            $savedElIds = [];
+            $savedGroupIds = [];
 
-            foreach ($stepData['elements'] as $j => $elData) {
-                $payload = [
-                    'name' => $elData['name'],
-                    'type' => $elData['type'],
-                    'label' => $elData['label'],
-                    'placeholder' => $elData['placeholder'] ?? null,
-                    'required' => $elData['required'],
-                    'order' => $j,
-                    'configuration' => $elData['configuration'] ?: null,
+            foreach ($stepData['groups'] as $gi => $groupData) {
+                $groupPayload = [
+                    'title'  => $groupData['title'],
+                    'header' => $groupData['header'] ?: null,
+                    'footer' => $groupData['footer'] ?: null,
+                    'order'  => $gi,
                 ];
 
-                if ($elData['id']) {
-                    $el = Element::find($elData['id']);
-                    $el->update($payload);
+                if ($groupData['id']) {
+                    $group = Group::find($groupData['id']);
+                    $group->update($groupPayload);
                 } else {
-                    $el = $step->elements()->create($payload);
+                    $group = $step->groups()->create($groupPayload);
                 }
-                $savedElIds[] = $el->id;
+                $savedGroupIds[] = $group->id;
+
+                $savedElIds = [];
+
+                foreach ($groupData['elements'] as $ei => $elData) {
+                    $payload = [
+                        'name'          => $elData['name'],
+                        'type'          => $elData['type'],
+                        'label'         => $elData['label'],
+                        'placeholder'   => $elData['placeholder'] ?? null,
+                        'required'      => $elData['required'],
+                        'order'         => $ei,
+                        'configuration' => $elData['configuration'] ?: null,
+                    ];
+
+                    if ($elData['id']) {
+                        $el = Element::find($elData['id']);
+                        $el->update($payload);
+                    } else {
+                        $el = $group->elements()->create($payload);
+                    }
+                    $savedElIds[] = $el->id;
+                }
+
+                $group->elements()->whereNotIn('id', $savedElIds)->delete();
             }
 
-            // Delete removed elements
-            $step->elements()->whereNotIn('id', $savedElIds)->delete();
+            // Cascade in DB handles elements when group deleted
+            $step->groups()->whereNotIn('id', $savedGroupIds)->delete();
         }
 
-        // Delete removed steps
-        $form->steps()->whereNotIn('id', $savedStepIds)->each(fn($s) => $s->elements()->delete() || $s->delete());
+        // Cascade in DB handles groups → elements when step deleted
+        $form->steps()->whereNotIn('id', $savedStepIds)->delete();
 
         session()->flash('success', 'Form salvato con successo.');
         $this->redirect(route('admin.forms.index'));
-    }
-
-    public function toggleStep(int $index): void
-    {
-        $this->openSteps[$index] = !($this->openSteps[$index] ?? false);
     }
 
     public function render()

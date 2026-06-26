@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Element extends Model
 {
     protected $fillable = [
-        'step_id', 'name', 'type', 'label', 'placeholder',
+        'group_id', 'name', 'type', 'label', 'placeholder',
         'required', 'order', 'configuration',
     ];
 
@@ -18,9 +18,9 @@ class Element extends Model
         'configuration' => 'array',
     ];
 
-    public function step(): BelongsTo
+    public function group(): BelongsTo
     {
-        return $this->belongsTo(Step::class);
+        return $this->belongsTo(Group::class);
     }
 
     public function objectRecords(): HasMany

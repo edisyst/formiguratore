@@ -1,3 +1,87 @@
+<style>
+.group-card {
+    border: 1px solid #dee2e6;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.group-card-title {
+    padding: 0.75rem 1.25rem 0;
+    text-align: center;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.group-title-rule {
+    border: 0;
+    border-top: 2px solid #1a56a0;
+    margin: 0.4rem 0 0;
+    opacity: 1;
+}
+.group-card-header {
+    text-align: center;
+    color: #6c757d;
+    font-size: .875rem;
+    padding: 0.5rem 1.25rem 0;
+    margin: 0;
+}
+.group-card-body {
+    padding: 0.75rem 1.25rem 0.75rem;
+}
+.group-card-footer {
+    text-align: center;
+    color: #6c757d;
+    font-size: .875rem;
+    padding: 0 1.25rem 0.75rem;
+    margin: 0;
+}
+
+/* Blue table headers */
+.table-blue thead tr th {
+    background-color: #1a56a0;
+    color: #fff;
+    border-color: #1a56a0;
+    font-weight: 600;
+}
+.table-blue {
+    border: 1px solid #dee2e6;
+    margin-bottom: 0;
+}
+
+/* Object/file action links */
+.action-link-danger { color: #dc3545; text-decoration: none; font-size: .875rem; }
+.action-link-danger:hover { text-decoration: underline; }
+.action-link-primary { color: #1a56a0; text-decoration: none; font-size: .875rem; }
+.action-link-primary:hover { text-decoration: underline; }
+
+/* Compact modal */
+.modal-header-blue {
+    background-color: #1a56a0;
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 0;
+}
+.modal-header-blue .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+.modal-compact .modal-body {
+    padding: 1rem 1.25rem 0.5rem;
+}
+.modal-compact .modal-footer {
+    padding: 0.5rem 1.25rem 0.75rem;
+    border-top: none;
+    justify-content: flex-start;
+}
+.modal-compact .form-control,
+.modal-compact .form-select {
+    border-radius: 2px;
+}
+.modal-field-label {
+    font-size: .85rem;
+    margin-bottom: 0.2rem;
+}
+</style>
+
 <div>
     <h2 class="mb-1">{{ $form->name }}</h2>
     @if($form->description)
@@ -20,92 +104,129 @@
                 <div class="accordion-body">
 
                     @forelse($step->groups as $gi => $group)
-                    <div class="mb-4 {{ $gi > 0 ? 'pt-3 border-top' : '' }}">
+                    <div class="group-card mb-4">
 
-                        <h5 class="mb-2">{{ $group->title }}</h5>
+                        {{-- Group title --}}
+                        <div class="group-card-title">
+                            <strong>{{ $group->title }}</strong>
+                            <hr class="group-title-rule">
+                        </div>
 
                         @if($group->header)
-                            <p class="text-muted small mb-3">{{ $group->header }}</p>
+                            <p class="group-card-header">{{ $group->header }}</p>
                         @endif
 
-                        @forelse($group->elements as $element)
-                        <div class="mb-4">
-                            @if($element->type === 'object')
-                                <!-- Object Element: Table -->
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">
+                        <div class="group-card-body">
+                            @forelse($group->elements as $element)
+                            <div class="mb-4">
+
+                                @if($element->type === 'object')
+                                    {{-- Object Element --}}
+                                    <div class="mb-2" style="font-size:.85rem;">
+                                        @if($element->required) <span class="text-danger me-1">*</span> @endif
                                         {{ $element->label }}
-                                        @if($element->required) <span class="badge bg-danger ms-1 small">*</span> @endif
-                                    </h6>
-                                    <button type="button" class="btn btn-sm btn-success" wire:click="openModal({{ $element->id }})">
-                                        <i class="fa fa-plus me-1"></i> Aggiungi
-                                    </button>
-                                </div>
+                                    </div>
 
-                                @php $fields = $element->configuration['fields'] ?? []; @endphp
+                                    @php $fields = $element->configuration['fields'] ?? []; @endphp
 
-                                @if($element->objectRecords->isEmpty())
-                                    <p class="text-muted small">Nessun record.</p>
-                                @else
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-bordered">
-                                            <thead class="table-light">
+                                    <div class="table-responsive mb-2">
+                                        <table class="table table-sm table-bordered table-blue">
+                                            <thead>
                                                 <tr>
                                                     @foreach($fields as $field)
                                                         <th>{{ $field['label'] }}</th>
                                                     @endforeach
-                                                    <th class="text-end">Azioni</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($element->objectRecords as $record)
+                                                @forelse($element->objectRecords as $record)
                                                 <tr>
                                                     @foreach($fields as $field)
                                                         <td>{{ $record->data[$field['name']] ?? '–' }}</td>
                                                     @endforeach
-                                                    <td class="text-end">
-                                                        <button type="button" class="btn btn-xs btn-sm btn-outline-primary" wire:click="openModal({{ $element->id }}, {{ $record->id }})">
-                                                            <i class="fa fa-edit"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-xs btn-sm btn-outline-danger" wire:click="deleteRecord({{ $record->id }})"
+                                                    <td class="text-nowrap">
+                                                        <button type="button" class="action-link-danger btn btn-link p-0 me-2" wire:click="deleteRecord({{ $record->id }})"
                                                                 onclick="return confirm('Eliminare questo record?')">
-                                                            <i class="fa fa-trash"></i>
+                                                            <i class="fa fa-times me-1"></i>Elimina
+                                                        </button>
+                                                        <button type="button" class="action-link-primary btn btn-link p-0" wire:click="openModal({{ $element->id }}, {{ $record->id }})">
+                                                            <i class="fa fa-pencil me-1"></i>Modifica
                                                         </button>
                                                     </td>
                                                 </tr>
-                                                @endforeach
+                                                @empty
+                                                <tr>
+                                                    <td colspan="{{ count($fields) + 1 }}" class="text-muted text-center small">Nessun record.</td>
+                                                </tr>
+                                                @endforelse
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div class="text-center">
+                                        <button type="button" class="btn btn-primary btn-sm" wire:click="openModal({{ $element->id }})">
+                                            <i class="fa fa-plus me-1"></i> Aggiungi
+                                        </button>
+                                    </div>
+
+                                @elseif($element->type === 'file')
+                                    {{-- File Element --}}
+                                    <div class="mb-2" style="font-size:.85rem;">
+                                        @if($element->required) <span class="text-danger me-1">*</span> @endif
+                                        {{ $element->label }}
+                                    </div>
+                                    <div class="table-responsive mb-2">
+                                        <table class="table table-sm table-bordered table-blue">
+                                            <thead>
+                                                <tr>
+                                                    <th>File caricato</th>
+                                                    <th style="width:120px;">Scadenza</th>
+                                                    <th style="width:100px;">Elimina</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3" class="text-muted text-center small">Nessun file caricato.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div>
+                                        <label class="btn btn-primary btn-sm mb-0" style="cursor:pointer;">
+                                            <i class="fa fa-plus me-1"></i> Allega documento
+                                            <input type="file" class="d-none">
+                                        </label>
+                                    </div>
+
+                                @else
+                                    {{-- Regular Element --}}
+                                    <label class="form-label mb-1" style="font-size:.85rem;">
+                                        @if($element->required) <span class="text-danger me-1">*</span> @endif
+                                        {{ $element->label }}
+                                    </label>
+
+                                    @if($element->type === 'text' || $element->type === 'date')
+                                        <input type="{{ $element->type }}" class="form-control" placeholder="{{ $element->placeholder }}">
+                                    @elseif($element->type === 'textarea')
+                                        <textarea class="form-control" placeholder="{{ $element->placeholder }}" rows="3"></textarea>
+                                    @elseif($element->type === 'select')
+                                        <select class="form-select">
+                                            <option value="">{{ $element->placeholder ?: 'Seleziona...' }}</option>
+                                            @foreach($element->configuration['options'] ?? [] as $opt)
+                                                <option>{{ $opt }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                 @endif
 
-                            @else
-                                <!-- Regular Element -->
-                                <label class="form-label fw-semibold">
-                                    {{ $element->label }}
-                                    @if($element->required) <span class="text-danger">*</span> @endif
-                                </label>
-
-                                @if($element->type === 'text' || $element->type === 'date' || $element->type === 'file')
-                                    <input type="{{ $element->type }}" class="form-control" placeholder="{{ $element->placeholder }}">
-                                @elseif($element->type === 'textarea')
-                                    <textarea class="form-control" placeholder="{{ $element->placeholder }}" rows="3"></textarea>
-                                @elseif($element->type === 'select')
-                                    <select class="form-select">
-                                        <option value="">{{ $element->placeholder ?: 'Seleziona...' }}</option>
-                                        @foreach($element->configuration['options'] ?? [] as $opt)
-                                            <option>{{ $opt }}</option>
-                                        @endforeach
-                                    </select>
-                                @endif
-                            @endif
+                            </div>
+                            @empty
+                                <p class="text-muted small">Nessun elemento in questo gruppo.</p>
+                            @endforelse
                         </div>
-                        @empty
-                            <p class="text-muted small">Nessun elemento in questo gruppo.</p>
-                        @endforelse
 
                         @if($group->footer)
-                            <p class="text-muted small mt-2">{{ $group->footer }}</p>
+                            <p class="group-card-footer">{{ $group->footer }}</p>
                         @endif
 
                     </div>
@@ -131,38 +252,37 @@
         $fields = $el ? ($el->configuration['fields'] ?? []) : [];
     @endphp
     <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $editingRecordId ? 'Modifica Record' : 'Nuovo Record' }} – {{ $el?->label }}</h5>
-                    <button type="button" class="btn-close" wire:click="closeModal"></button>
+        <div class="modal-dialog modal-compact" style="max-width:500px;">
+            <div class="modal-content" style="border-radius:2px;">
+                <div class="modal-header-blue d-flex justify-content-between align-items-center">
+                    <span style="font-size:1rem; font-weight:600;">{{ $el?->label }}</span>
+                    <button type="button" class="btn-close btn-close-white" wire:click="closeModal" aria-label="Chiudi"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body modal-compact">
                     @foreach($fields as $field)
                     <div class="mb-3">
-                        <label class="form-label">
+                        <div class="modal-field-label">
+                            @if($field['required'] ?? false) <span class="text-danger me-1">*</span> @endif
                             {{ $field['label'] }}
-                            @if($field['required'] ?? false) <span class="text-danger">*</span> @endif
-                        </label>
+                        </div>
                         @if(($field['type'] ?? 'text') === 'textarea')
-                            <textarea class="form-control" wire:model="modalData.{{ $field['name'] }}" rows="3"></textarea>
+                            <textarea class="form-control form-control-sm" wire:model="modalData.{{ $field['name'] }}" rows="3"></textarea>
                         @elseif(($field['type'] ?? 'text') === 'select')
-                            <select class="form-select" wire:model="modalData.{{ $field['name'] }}">
+                            <select class="form-select form-select-sm" wire:model="modalData.{{ $field['name'] }}">
                                 <option value="">Seleziona...</option>
                                 @foreach($field['options'] ?? [] as $opt)
                                     <option>{{ $opt }}</option>
                                 @endforeach
                             </select>
                         @else
-                            <input type="{{ $field['type'] ?? 'text' }}" class="form-control" wire:model="modalData.{{ $field['name'] }}">
+                            <input type="{{ $field['type'] ?? 'text' }}" class="form-control form-control-sm" wire:model="modalData.{{ $field['name'] }}">
                         @endif
                     </div>
                     @endforeach
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" wire:click="closeModal">Annulla</button>
-                    <button type="button" class="btn btn-primary" wire:click="saveRecord">
-                        <i class="fa fa-save me-1"></i> Salva
+                <div class="modal-footer modal-compact">
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="saveRecord">
+                        Invia
                     </button>
                 </div>
             </div>

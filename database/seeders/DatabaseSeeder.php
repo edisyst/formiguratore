@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@formiguratore.local'],
-            ['name' => 'Admin', 'password' => bcrypt('password')]
+            ['email' => 'admin@admin.admin'],
+            ['name' => 'Administrator', 'password' => bcrypt('admin')]
         );
 
         $this->call(FormSeeder::class);

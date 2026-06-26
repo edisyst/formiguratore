@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('elements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('step_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('group_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('type'); // text, textarea, select, file, date, object
             $table->string('label');

@@ -15,8 +15,8 @@ class Step extends Model
         return $this->belongsTo(Form::class);
     }
 
-    public function elements(): HasMany
+    public function groups(): HasMany
     {
-        return $this->hasMany(Element::class)->orderBy('order');
+        return $this->hasMany(Group::class)->orderBy('order');
     }
 }
