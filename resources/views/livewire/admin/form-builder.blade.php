@@ -105,11 +105,51 @@
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label small text-muted">Header <span class="fw-normal">(testo introduttivo — opzionale)</span></label>
-                                    <textarea class="form-control form-control-sm" rows="2" wire:model="steps.{{ $si }}.groups.{{ $gi }}.header" placeholder="Testo mostrato prima degli elementi del gruppo..."></textarea>
+                                    <div
+                                        wire:ignore
+                                        x-data="{
+                                            editor: null,
+                                            wireKey: 'steps.{{ $si }}.groups.{{ $gi }}.header',
+                                            init() {
+                                                ClassicEditor.create(this.$refs.editorEl, {
+                                                    toolbar: ['bold','italic','underline','strikethrough','|','link','|','bulletedList','numberedList','|','blockQuote','|','undo','redo'],
+                                                    language: 'it'
+                                                }).then(editor => {
+                                                    this.editor = editor;
+                                                    editor.setData(@js($group['header'] ?? ''));
+                                                    editor.model.document.on('change:data', () => {
+                                                        $wire.set(this.wireKey, editor.getData());
+                                                    });
+                                                });
+                                            }
+                                        }"
+                                    >
+                                        <div x-ref="editorEl"></div>
+                                    </div>
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label small text-muted">Footer <span class="fw-normal">(testo conclusivo — opzionale)</span></label>
-                                    <textarea class="form-control form-control-sm" rows="2" wire:model="steps.{{ $si }}.groups.{{ $gi }}.footer" placeholder="Testo mostrato dopo gli elementi del gruppo..."></textarea>
+                                    <div
+                                        wire:ignore
+                                        x-data="{
+                                            editor: null,
+                                            wireKey: 'steps.{{ $si }}.groups.{{ $gi }}.footer',
+                                            init() {
+                                                ClassicEditor.create(this.$refs.editorEl, {
+                                                    toolbar: ['bold','italic','underline','strikethrough','|','link','|','bulletedList','numberedList','|','blockQuote','|','undo','redo'],
+                                                    language: 'it'
+                                                }).then(editor => {
+                                                    this.editor = editor;
+                                                    editor.setData(@js($group['footer'] ?? ''));
+                                                    editor.model.document.on('change:data', () => {
+                                                        $wire.set(this.wireKey, editor.getData());
+                                                    });
+                                                });
+                                            }
+                                        }"
+                                    >
+                                        <div x-ref="editorEl"></div>
+                                    </div>
                                 </div>
                             </div>
 

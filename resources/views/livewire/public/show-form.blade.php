@@ -19,7 +19,6 @@
     opacity: 1;
 }
 .group-card-header {
-    text-align: center;
     color: #6c757d;
     font-size: .875rem;
     padding: 0.5rem 1.25rem 0;
@@ -29,7 +28,6 @@
     padding: 0.75rem 1.25rem 0.75rem;
 }
 .group-card-footer {
-    text-align: center;
     color: #6c757d;
     font-size: .875rem;
     padding: 0 1.25rem 0.75rem;
