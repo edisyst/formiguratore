@@ -76,6 +76,20 @@ class FormBuilder extends Component
         }
     }
 
+    public function updatedNewElement($value, ?string $key = null): void
+    {
+        if ($key === null) return;
+
+        $parts = explode('.', $key);
+        if (count($parts) === 3 && $parts[2] === 'label') {
+            $si = (int) $parts[0];
+            $gi = (int) $parts[1];
+            if (empty($this->newElement[$si][$gi]['name'] ?? '')) {
+                $this->newElement[$si][$gi]['name'] = Str::slug($value, '_');
+            }
+        }
+    }
+
     // ── Step management ──────────────────────────────────────────────────────
 
     public function addStep(): void

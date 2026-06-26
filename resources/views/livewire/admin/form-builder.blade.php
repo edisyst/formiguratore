@@ -155,7 +155,7 @@
                                 <h6 class="mb-3">Aggiungi Elemento</h6>
                                 <div class="row g-2">
                                     <div class="col-md-3">
-                                        <label class="form-label small">Tipo</label>
+                                        <label class="form-label small"><span class="text-danger">*</span> Tipo</label>
                                         <select class="form-select form-select-sm" wire:model.live="newElement.{{ $si }}.{{ $gi }}.type">
                                             <option value="text">Text</option>
                                             <option value="textarea">Textarea</option>
@@ -166,12 +166,12 @@
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label small">Nome (campo DB)</label>
-                                        <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.name" placeholder="nome_campo">
+                                        <label class="form-label small"><span class="text-danger">*</span> Label</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model.live="newElement.{{ $si }}.{{ $gi }}.label" placeholder="Etichetta">
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label small">Label</label>
-                                        <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.label" placeholder="Etichetta">
+                                        <label class="form-label small"><span class="text-danger">*</span> Nome (campo DB)</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.name" placeholder="auto da label">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small">Placeholder</label>

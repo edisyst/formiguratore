@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Element extends Model
 {
     protected $fillable = [
-        'group_id', 'name', 'type', 'label', 'placeholder',
+        'group_id', 'uuid', 'name', 'type', 'label', 'placeholder',
         'required', 'order', 'configuration',
     ];
 
@@ -17,6 +18,15 @@ class Element extends Model
         'required' => 'boolean',
         'configuration' => 'array',
     ];
+
+    public function save(array $options = []): bool
+    {
+        if (! $this->exists && empty($this->uuid)) {
+            $this->uuid = (string) Str::uuid();
+        }
+
+        return parent::save($options);
+    }
 
     public function group(): BelongsTo
     {
