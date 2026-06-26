@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('group_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('type'); // text, textarea, select, file, date, object
-            $table->string('label');
+            $table->text('label');
             $table->string('placeholder')->nullable();
             $table->boolean('required')->default(false);
             $table->unsignedInteger('order')->default(0);
