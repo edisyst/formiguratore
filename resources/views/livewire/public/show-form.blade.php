@@ -18,81 +18,101 @@
             </h2>
             <div id="step-{{ $step->id }}" class="accordion-collapse collapse {{ $si === 0 ? 'show' : '' }}" data-bs-parent="#formAccordion">
                 <div class="accordion-body">
-                    @forelse($step->elements as $element)
-                    <div class="mb-4">
-                        @if($element->type === 'object')
-                            <!-- Object Element: Table -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0">
-                                    {{ $element->label }}
-                                    @if($element->required) <span class="badge bg-danger ms-1 small">*</span> @endif
-                                </h6>
-                                <button type="button" class="btn btn-sm btn-success" wire:click="openModal({{ $element->id }})">
-                                    <i class="fa fa-plus me-1"></i> Aggiungi
-                                </button>
-                            </div>
 
-                            @php $fields = $element->configuration['fields'] ?? []; @endphp
+                    @forelse($step->groups as $gi => $group)
+                    <div class="mb-4 {{ $gi > 0 ? 'pt-3 border-top' : '' }}">
 
-                            @if($element->objectRecords->isEmpty())
-                                <p class="text-muted small">Nessun record.</p>
-                            @else
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered">
-                                        <thead class="table-light">
-                                            <tr>
-                                                @foreach($fields as $field)
-                                                    <th>{{ $field['label'] }}</th>
-                                                @endforeach
-                                                <th class="text-end">Azioni</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($element->objectRecords as $record)
-                                            <tr>
-                                                @foreach($fields as $field)
-                                                    <td>{{ $record->data[$field['name']] ?? '–' }}</td>
-                                                @endforeach
-                                                <td class="text-end">
-                                                    <button type="button" class="btn btn-xs btn-sm btn-outline-primary" wire:click="openModal({{ $element->id }}, {{ $record->id }})">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-xs btn-sm btn-outline-danger" wire:click="deleteRecord({{ $record->id }})"
-                                                            onclick="return confirm('Eliminare questo record?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
+                        <h5 class="mb-2">{{ $group->title }}</h5>
 
-                        @else
-                            <!-- Regular Element: Static display -->
-                            <label class="form-label fw-semibold">
-                                {{ $element->label }}
-                                @if($element->required) <span class="text-danger">*</span> @endif
-                            </label>
-
-                            @if($element->type === 'text' || $element->type === 'date' || $element->type === 'file')
-                                <input type="{{ $element->type }}" class="form-control" placeholder="{{ $element->placeholder }}">
-                            @elseif($element->type === 'textarea')
-                                <textarea class="form-control" placeholder="{{ $element->placeholder }}" rows="3"></textarea>
-                            @elseif($element->type === 'select')
-                                <select class="form-select">
-                                    <option value="">{{ $element->placeholder ?: 'Seleziona...' }}</option>
-                                    @foreach($element->configuration['options'] ?? [] as $opt)
-                                        <option>{{ $opt }}</option>
-                                    @endforeach
-                                </select>
-                            @endif
+                        @if($group->header)
+                            <p class="text-muted small mb-3">{{ $group->header }}</p>
                         @endif
+
+                        @forelse($group->elements as $element)
+                        <div class="mb-4">
+                            @if($element->type === 'object')
+                                <!-- Object Element: Table -->
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">
+                                        {{ $element->label }}
+                                        @if($element->required) <span class="badge bg-danger ms-1 small">*</span> @endif
+                                    </h6>
+                                    <button type="button" class="btn btn-sm btn-success" wire:click="openModal({{ $element->id }})">
+                                        <i class="fa fa-plus me-1"></i> Aggiungi
+                                    </button>
+                                </div>
+
+                                @php $fields = $element->configuration['fields'] ?? []; @endphp
+
+                                @if($element->objectRecords->isEmpty())
+                                    <p class="text-muted small">Nessun record.</p>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    @foreach($fields as $field)
+                                                        <th>{{ $field['label'] }}</th>
+                                                    @endforeach
+                                                    <th class="text-end">Azioni</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($element->objectRecords as $record)
+                                                <tr>
+                                                    @foreach($fields as $field)
+                                                        <td>{{ $record->data[$field['name']] ?? '–' }}</td>
+                                                    @endforeach
+                                                    <td class="text-end">
+                                                        <button type="button" class="btn btn-xs btn-sm btn-outline-primary" wire:click="openModal({{ $element->id }}, {{ $record->id }})">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-xs btn-sm btn-outline-danger" wire:click="deleteRecord({{ $record->id }})"
+                                                                onclick="return confirm('Eliminare questo record?')">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                            @else
+                                <!-- Regular Element -->
+                                <label class="form-label fw-semibold">
+                                    {{ $element->label }}
+                                    @if($element->required) <span class="text-danger">*</span> @endif
+                                </label>
+
+                                @if($element->type === 'text' || $element->type === 'date' || $element->type === 'file')
+                                    <input type="{{ $element->type }}" class="form-control" placeholder="{{ $element->placeholder }}">
+                                @elseif($element->type === 'textarea')
+                                    <textarea class="form-control" placeholder="{{ $element->placeholder }}" rows="3"></textarea>
+                                @elseif($element->type === 'select')
+                                    <select class="form-select">
+                                        <option value="">{{ $element->placeholder ?: 'Seleziona...' }}</option>
+                                        @foreach($element->configuration['options'] ?? [] as $opt)
+                                            <option>{{ $opt }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            @endif
+                        </div>
+                        @empty
+                            <p class="text-muted small">Nessun elemento in questo gruppo.</p>
+                        @endforelse
+
+                        @if($group->footer)
+                            <p class="text-muted small mt-2">{{ $group->footer }}</p>
+                        @endif
+
                     </div>
                     @empty
-                        <p class="text-muted">Nessun elemento in questo step.</p>
+                        <p class="text-muted">Nessun gruppo in questo step.</p>
                     @endforelse
+
                 </div>
             </div>
         </div>
@@ -104,7 +124,10 @@
     <!-- Object Record Modal -->
     @if($showModal)
     @php
-        $el = $form->steps->flatMap(fn($s) => $s->elements)->firstWhere('id', $editingElementId);
+        $el = $form->steps
+            ->flatMap(fn($s) => $s->groups)
+            ->flatMap(fn($g) => $g->elements)
+            ->firstWhere('id', $editingElementId);
         $fields = $el ? ($el->configuration['fields'] ?? []) : [];
     @endphp
     <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
