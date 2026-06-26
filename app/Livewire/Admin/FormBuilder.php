@@ -209,6 +209,8 @@ class FormBuilder extends Component
         if ($type === 'select') {
             $raw = $data['options_raw'] ?? '';
             $config['options'] = array_values(array_filter(array_map('trim', explode("\n", $raw))));
+        } elseif ($type === 'boolean_select') {
+            $config['options'] = ['-', 'SI', 'NO'];
         } elseif ($type === 'object') {
             $config['fields'] = $data['object_fields'] ?? [];
         }

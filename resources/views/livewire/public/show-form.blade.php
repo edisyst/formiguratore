@@ -226,6 +226,13 @@
                                                 <option>{{ $opt }}</option>
                                             @endforeach
                                         </select>
+                                    @elseif($element->type === 'boolean_select')
+                                        <select class="form-select">
+                                            <option value="">{{ $element->placeholder ?: 'Seleziona...' }}</option>
+                                            <option value="-">–</option>
+                                            <option value="SI">SI</option>
+                                            <option value="NO">NO</option>
+                                        </select>
                                     @endif
                                 @endif
 

@@ -128,6 +128,9 @@
                                             Opzioni: {{ implode(', ', $element['configuration']['options']) }}
                                         </div>
                                     @endif
+                                    @if($element['type'] === 'boolean_select')
+                                        <div class="small text-muted mt-1">Opzioni fisse: –, SI, NO</div>
+                                    @endif
                                     @if($element['type'] === 'object' && !empty($element['configuration']['fields']))
                                         <div class="small text-muted mt-1">
                                             Campi: {{ collect($element['configuration']['fields'])->pluck('label')->implode(', ') }}
@@ -160,6 +163,7 @@
                                             <option value="text">Text</option>
                                             <option value="textarea">Textarea</option>
                                             <option value="select">Select</option>
+                                            <option value="boolean_select">Boolean Select (–/SI/NO)</option>
                                             <option value="checkbox">Checkbox</option>
                                             <option value="file">File</option>
                                             <option value="date">Date</option>
@@ -188,6 +192,12 @@
                                 <div class="mt-2">
                                     <label class="form-label small">Opzioni (una per riga)</label>
                                     <textarea class="form-control form-control-sm" rows="3" wire:model="newElement.{{ $si }}.{{ $gi }}.options_raw" placeholder="Opzione 1&#10;Opzione 2&#10;Opzione 3"></textarea>
+                                </div>
+                                @endif
+
+                                @if(($newElement[$si][$gi]['type'] ?? 'text') === 'boolean_select')
+                                <div class="mt-2">
+                                    <p class="text-muted small mb-0"><i class="fa fa-info-circle me-1"></i>Opzioni fisse: <strong>–</strong>, <strong>SI</strong>, <strong>NO</strong>. Non è necessario configurare nulla.</p>
                                 </div>
                                 @endif
 
