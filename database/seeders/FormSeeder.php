@@ -233,5 +233,221 @@ class FormSeeder extends Seeder
             ],
         ]);
         ObjectRecord::create(['element_id' => $elAcc->id, 'data' => ['nome' => 'Anna', 'cognome' => 'Verdi', 'email' => 'anna@email.it', 'dieta' => 'Vegetariano']]);
+
+
+        // ── Form 5: Dichiarazione Impresa ──────────────────────────────────
+        $form5 = Form::create([
+            'name'        => 'Dichiarazione Impresa',
+            'slug'        => 'dichiarazione-impresa',
+            'description' => 'Modulo di dichiarazione per imprese ai fini della partecipazione a procedure di affidamento.',
+        ]);
+
+        // ── Step 1: Dichiarante ────────────────────────────────────────────
+        $step5a = Step::create(['form_id' => $form5->id, 'title' => 'Dichiarante', 'order' => 0]);
+
+        $grp5a1 = Group::create(['step_id' => $step5a->id, 'title' => 'Dichiarante', 'header' => null, 'footer' => null, 'order' => 0]);
+        Element::create(['group_id' => $grp5a1->id, 'name' => 'nome',           'type' => 'text', 'label' => 'Nome',           'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a1->id, 'name' => 'cognome',        'type' => 'text', 'label' => 'Cognome',        'placeholder' => null, 'required' => true,  'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a1->id, 'name' => 'codice_fiscale', 'type' => 'text', 'label' => 'Codice fiscale', 'placeholder' => null, 'required' => true,  'order' => 2, 'configuration' => null]);
+
+        $grp5a2 = Group::create(['step_id' => $step5a->id, 'title' => 'Luogo e data di nascita', 'header' => null, 'footer' => null, 'order' => 1]);
+        Element::create(['group_id' => $grp5a2->id, 'name' => 'data_di_nascita', 'type' => 'date', 'label' => 'Data di nascita', 'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a2->id, 'name' => 'nazione',         'type' => 'text', 'label' => 'Nazione',         'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a2->id, 'name' => 'provincia',       'type' => 'text', 'label' => 'Provincia',       'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a2->id, 'name' => 'citta',           'type' => 'text', 'label' => 'Città',           'placeholder' => null, 'required' => true, 'order' => 3, 'configuration' => null]);
+
+        $grp5a3 = Group::create(['step_id' => $step5a->id, 'title' => 'Residenza', 'header' => null, 'footer' => null, 'order' => 2]);
+        Element::create(['group_id' => $grp5a3->id, 'name' => 'nazione_di_residenza',   'type' => 'text', 'label' => 'Nazione di residenza',   'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a3->id, 'name' => 'indirizzo_di_residenza', 'type' => 'text', 'label' => 'Indirizzo di residenza', 'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a3->id, 'name' => 'provincia_residenza',    'type' => 'text', 'label' => 'Provincia',              'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a3->id, 'name' => 'citta_residenza',        'type' => 'text', 'label' => 'Città',                  'placeholder' => null, 'required' => true, 'order' => 3, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a3->id, 'name' => 'cap',                    'type' => 'text', 'label' => 'CAP',                    'placeholder' => null, 'required' => true, 'order' => 4, 'configuration' => null]);
+
+        $grp5a4 = Group::create(['step_id' => $step5a->id, 'title' => 'Dichiarazione Art. 1, Comma 9, Lettera E - Legge 190/2012', 'header' => null, 'footer' => null, 'order' => 3]);
+        Element::create(['group_id' => $grp5a4->id, 'name' => 'parentela_affinita',           'type' => 'boolean_select', 'label' => 'Per quanto a propria conoscenza, sussistono relazioni di parentela o affinità, tra i titolari, gli amministratori, i soci e i dipendenti dell\'impresa e i dirigenti e i dipendenti dell\'Amministrazione Aggiudicatrice?', 'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5a4->id, 'name' => 'relazioni_parentela_affinita', 'type' => 'textarea',       'label' => 'Se sì, indicare di seguito le relazioni di parentela o affinità',                                                                                                                                                         'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
+
+        // ── Step 2: Dati attività ──────────────────────────────────────────
+        $step5b = Step::create(['form_id' => $form5->id, 'title' => 'Dati attività', 'order' => 1]);
+
+        $grp5b1 = Group::create(['step_id' => $step5b->id, 'title' => 'Dati attività', 'header' => null, 'footer' => null, 'order' => 0]);
+        Element::create(['group_id' => $grp5b1->id, 'name' => 'ragione_sociale',             'type' => 'text', 'label' => 'Ragione sociale/Nome e Cognome', 'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b1->id, 'name' => 'agenzia_stazione_competenza', 'type' => 'text', 'label' => 'Agenzia della Stazione di competenza', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b1->id, 'name' => 'sito_web',                   'type' => 'text', 'label' => 'Sito Web',                        'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
+
+        $grp5b2 = Group::create(['step_id' => $step5b->id, 'title' => 'Tribunale di competenza', 'header' => null, 'footer' => null, 'order' => 1]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_nazione',   'type' => 'text', 'label' => 'Nazione',   'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_provincia', 'type' => 'text', 'label' => 'Provincia', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_comune',    'type' => 'text', 'label' => 'Comune',    'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_indirizzo', 'type' => 'text', 'label' => 'Indirizzo', 'placeholder' => null, 'required' => false, 'order' => 3, 'configuration' => null]);
+
+        $grp5b3 = Group::create(['step_id' => $step5b->id, 'title' => 'Ispettorato territoriale del lavoro di competenza', 'header' => null, 'footer' => null, 'order' => 2]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_nazione',   'type' => 'text', 'label' => 'Nazione',   'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_provincia', 'type' => 'text', 'label' => 'Provincia', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_comune',    'type' => 'text', 'label' => 'Comune',    'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_indirizzo', 'type' => 'text', 'label' => 'Indirizzo', 'placeholder' => null, 'required' => false, 'order' => 3, 'configuration' => null]);
+
+        $grp5b4 = Group::create(['step_id' => $step5b->id, 'title' => 'Contatti principali', 'header' => null, 'footer' => null, 'order' => 3]);
+        Element::create([
+            'group_id'      => $grp5b4->id,
+            'name'          => 'contatti',
+            'type'          => 'object',
+            'label'         => 'Contatti principali',
+            'placeholder'   => null,
+            'required'      => true,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'tipo',        'label' => 'Tipo',        'type' => 'select', 'required' => true,  'options' => ['Telefono Fisso', 'Telefono Cellulare', 'Email', 'Pec']],
+                    ['name' => 'valore',      'label' => 'Valore',      'type' => 'text',   'required' => true],
+                    ['name' => 'descrizione', 'label' => 'Descrizione', 'type' => 'text',   'required' => false],
+                    ['name' => 'principale',  'label' => 'Principale',  'type' => 'select', 'required' => false, 'options' => ['Sì', 'No']],
+                ],
+            ],
+        ]);
+
+        $grp5b5 = Group::create(['step_id' => $step5b->id, 'title' => 'Sedi', 'header' => null, 'footer' => null, 'order' => 4]);
+        Element::create([
+            'group_id'      => $grp5b5->id,
+            'name'          => 'sedi',
+            'type'          => 'object',
+            'label'         => 'Sedi',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'sede_legale',    'label' => 'Sede Legale',    'type' => 'select', 'required' => false, 'options' => ['Sì', 'No']],
+                    ['name' => 'sede_operativa', 'label' => 'Sede Operativa', 'type' => 'select', 'required' => false, 'options' => ['Sì', 'No']],
+                    ['name' => 'regione',        'label' => 'Regione',        'type' => 'text',   'required' => false],
+                    ['name' => 'provincia',      'label' => 'Provincia',      'type' => 'text',   'required' => false],
+                    ['name' => 'comune',         'label' => 'Comune',         'type' => 'text',   'required' => false],
+                    ['name' => 'cf_iva',         'label' => 'CF/IVA',         'type' => 'text',   'required' => false],
+                    ['name' => 'indirizzo',      'label' => 'Indirizzo',      'type' => 'text',   'required' => false],
+                    ['name' => 'stato',          'label' => 'Stato',          'type' => 'text',   'required' => false],
+                    ['name' => 'cap',            'label' => 'CAP',            'type' => 'text',   'required' => false],
+                    ['name' => 'telefono',       'label' => 'Telefono',       'type' => 'text',   'required' => false],
+                ],
+            ],
+        ]);
+
+        $grp5b6 = Group::create(['step_id' => $step5b->id, 'title' => 'Disponibilità allo svolgimento di prestazioni in condizioni d\'urgenza', 'header' => null, 'footer' => null, 'order' => 5]);
+        Element::create(['group_id' => $grp5b6->id, 'name' => 'disponibilita_urgenza', 'type' => 'boolean_select', 'label' => 'Si rende disponibile dei contingenti di prestazione d\'urgenza', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grp5b7 = Group::create(['step_id' => $step5b->id, 'title' => 'Polizze professionali', 'header' => null, 'footer' => null, 'order' => 6]);
+        Element::create([
+            'group_id'      => $grp5b7->id,
+            'name'          => 'polizze_professionali',
+            'type'          => 'object',
+            'label'         => 'Polizze professionali',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'compagnia',       'label' => 'Compagnia',       'type' => 'text', 'required' => false],
+                    ['name' => 'numero_polizza',   'label' => 'Numero polizza',  'type' => 'text', 'required' => false],
+                    ['name' => 'massimale',        'label' => 'Massimale (€)',   'type' => 'text', 'required' => false],
+                    ['name' => 'scadenza',         'label' => 'Scadenza',        'type' => 'date', 'required' => false],
+                ],
+            ],
+        ]);
+
+        // ── Step 3: Certificazioni e abilitazioni ──────────────────────────
+        $step5c = Step::create(['form_id' => $form5->id, 'title' => 'Certificazioni e abilitazioni', 'order' => 2]);
+
+        $grp5c1 = Group::create(['step_id' => $step5c->id, 'title' => 'Certificazioni', 'header' => null, 'footer' => null, 'order' => 0]);
+        Element::create([
+            'group_id'      => $grp5c1->id,
+            'name'          => 'certificazioni',
+            'type'          => 'object',
+            'label'         => 'Certificazioni',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'tipo_certificazione', 'label' => 'Tipo certificazione', 'type' => 'text', 'required' => true],
+                    ['name' => 'ente_certificatore',  'label' => 'Ente certificatore',  'type' => 'text', 'required' => false],
+                    ['name' => 'numero',              'label' => 'Numero',              'type' => 'text', 'required' => false],
+                    ['name' => 'scadenza',            'label' => 'Scadenza',            'type' => 'date', 'required' => false],
+                    ['name' => 'allegato',            'label' => 'Allegato',            'type' => 'file', 'required' => false],
+                ],
+            ],
+        ]);
+
+        $grp5c2 = Group::create(['step_id' => $step5c->id, 'title' => 'Possesso abilitazione per realizzazione impianti di cui all\'Art. 1, D.M. 37/2008', 'header' => null, 'footer' => null, 'order' => 1]);
+        Element::create([
+            'group_id'      => $grp5c2->id,
+            'name'          => 'abilitazioni_dm37',
+            'type'          => 'object',
+            'label'         => 'Abilitazioni D.M. 37/2008',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'categoria', 'label' => 'Categoria', 'type' => 'text', 'required' => true],
+                    ['name' => 'lettera',   'label' => 'Lettera',   'type' => 'text', 'required' => false],
+                ],
+            ],
+        ]);
+
+        $grp5c3 = Group::create(['step_id' => $step5c->id, 'title' => 'Patente a crediti', 'header' => 'Se non si possiede la patente a crediti, compilare comunque il campo selezionando la voce "non tenuto". La patente con punteggio inferiore a 15 crediti non consente alle imprese e ai lavoratori autonomi di operare nei cantieri temporanei o mobili. Ricorda di tenere aggiornato il campo in caso di variazioni.', 'footer' => null, 'order' => 2]);
+        Element::create([
+            'group_id'      => $grp5c3->id,
+            'name'          => 'patente_crediti',
+            'type'          => 'object',
+            'label'         => 'Patente a crediti',
+            'placeholder'   => null,
+            'required'      => true,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'numero',    'label' => 'Numero',    'type' => 'text', 'required' => true],
+                    ['name' => 'punteggio', 'label' => 'Punteggio', 'type' => 'text', 'required' => false],
+                    ['name' => 'scadenza',  'label' => 'Scadenza',  'type' => 'date', 'required' => false],
+                    ['name' => 'allegato',  'label' => 'Allegato',  'type' => 'file', 'required' => false],
+                ],
+            ],
+        ]);
+
+        // ── Step 4: Ulteriore documentazione ──────────────────────────────
+        $step5d = Step::create(['form_id' => $form5->id, 'title' => 'Ulteriore documentazione', 'order' => 3]);
+
+        $grp5d1 = Group::create(['step_id' => $step5d->id, 'title' => 'Verifica della progettazione', 'header' => 'Possesso dei requisiti di cui all\'Art. 46 del D.Lgs 36/2023 ovvero il rispetto della NORMA EUROPEA UNI EN ISO 9001 / 17100 ovvero di essere in possesso di SISTEMI INTERNI DI CONTROLLO DI QUALITÀ ai sensi della progettazione.', 'footer' => null, 'order' => 0]);
+        Element::create(['group_id' => $grp5d1->id, 'name' => 'verifica_progettazione', 'type' => 'boolean_select', 'label' => 'Verifica della progettazione', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grp5d2 = Group::create(['step_id' => $step5d->id, 'title' => 'Coordinamento della sicurezza', 'header' => 'Possesso dei requisiti di cui all\'Art. 46 del D.Lgs 36/2023 ovvero il rispetto della NORMA EUROPEA UNI EN ISO 9001 / 17100 ovvero di essere in possesso di SISTEMI INTERNI DI CONTROLLO DI QUALITÀ con ADEGUATO AGGIORNAMENTO A CADENZA QUINQUENNALE di almeno 40 ore.', 'footer' => null, 'order' => 1]);
+        Element::create(['group_id' => $grp5d2->id, 'name' => 'coordinamento_sicurezza', 'type' => 'boolean_select', 'label' => 'Coordinamento della sicurezza', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grp5d3 = Group::create(['step_id' => $step5d->id, 'title' => 'Collaudo statico', 'header' => null, 'footer' => null, 'order' => 2]);
+        Element::create(['group_id' => $grp5d3->id, 'name' => 'collaudo_statico', 'type' => 'boolean_select', 'label' => 'Apportare alla professionale impegnato e architettura le tecniche di essere specifiche professionali impegnato e architettura di almeno 10 anni', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grp5d4 = Group::create(['step_id' => $step5d->id, 'title' => 'Collaudo tecnico-amministrativo', 'header' => null, 'footer' => null, 'order' => 3]);
+        Element::create(['group_id' => $grp5d4->id, 'name' => 'collaudo_tecnico_amministrativo', 'type' => 'boolean_select', 'label' => 'Apportare alla professionale impegnato e architettura le tecniche di essere specifiche professionali impegnato e architettura di almeno cinque anni', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grp5d5 = Group::create(['step_id' => $step5d->id, 'title' => 'Ulteriore documentazione', 'header' => null, 'footer' => null, 'order' => 4]);
+        Element::create([
+            'group_id'      => $grp5d5->id,
+            'name'          => 'ulteriore_documentazione',
+            'type'          => 'object',
+            'label'         => 'Ulteriore documentazione',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'file',     'label' => 'File',     'type' => 'file', 'required' => false],
+                    ['name' => 'scadenza', 'label' => 'Scadenza', 'type' => 'date', 'required' => false],
+                ],
+            ],
+        ]);
+
+        $grp5d6 = Group::create(['step_id' => $step5d->id, 'title' => 'Documentazione integrativa', 'header' => 'Di seguito è possibile allegare eventuali documenti integrativi alla scheda di iscrizione.', 'footer' => null, 'order' => 5]);
+        Element::create(['group_id' => $grp5d6->id, 'name' => 'documentazione_integrativa', 'type' => 'file', 'label' => 'Documentazione integrativa', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grp5d7 = Group::create(['step_id' => $step5d->id, 'title' => 'Privacy e termini', 'header' => null, 'footer' => null, 'order' => 6]);
+        Element::create(['group_id' => $grp5d7->id, 'name' => 'accettazione_privacy', 'type' => 'checkbox', 'label' => 'Prendete visione di quanto riportato e accettate integralmente l\'informativa privacy consultabile al seguente link Privacy e Termini', 'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
     }
 }
