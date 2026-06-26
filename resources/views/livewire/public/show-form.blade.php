@@ -198,6 +198,16 @@
                                         </label>
                                     </div>
 
+                                @elseif($element->type === 'checkbox')
+                                    {{-- Checkbox Element --}}
+                                    <div class="mb-1" style="font-size:.85rem;">
+                                        @if($element->required) <span class="text-danger me-1">*</span> @endif
+                                        {{ $element->label }}
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="form-check-input">
+                                    </div>
+
                                 @else
                                     {{-- Regular Element --}}
                                     <label class="form-label mb-1" style="font-size:.85rem;">

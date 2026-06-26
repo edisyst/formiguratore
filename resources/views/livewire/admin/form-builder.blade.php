@@ -160,6 +160,7 @@
                                             <option value="text">Text</option>
                                             <option value="textarea">Textarea</option>
                                             <option value="select">Select</option>
+                                            <option value="checkbox">Checkbox</option>
                                             <option value="file">File</option>
                                             <option value="date">Date</option>
                                             <option value="object">Object (sotto-form)</option>
