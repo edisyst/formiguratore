@@ -288,9 +288,12 @@
     </div>
 
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-primary" wire:click="save">
+        <a href="{{ route('admin.forms.index') }}" class="btn btn-outline-secondary">Annulla</a>
+    </div>
+
+    <div style="position: fixed; bottom: 24px; right: 24px; z-index: 1050;">
+        <button type="button" class="btn btn-primary btn-lg shadow" wire:click="save">
             <i class="fa fa-save me-1"></i> Salva Form
         </button>
-        <a href="{{ route('admin.forms.index') }}" class="btn btn-outline-secondary">Annulla</a>
     </div>
 </div>
