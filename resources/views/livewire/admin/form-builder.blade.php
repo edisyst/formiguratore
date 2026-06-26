@@ -115,6 +115,74 @@
 
                             <!-- Element list -->
                             @forelse($group['elements'] as $ei => $element)
+                            @if($element['type'] === 'object')
+                            <div class="border rounded p-2 mb-2 bg-light">
+                                <div class="d-flex align-items-start justify-content-between">
+                                    <div>
+                                        <span class="badge bg-primary me-2">object</span>
+                                        <strong>{{ $element['label'] }}</strong>
+                                        <code class="ms-2 small">{{ $element['name'] }}</code>
+                                        @if($element['required'])
+                                            <span class="badge bg-danger ms-1">required</span>
+                                        @endif
+                                    </div>
+                                    <div class="btn-group btn-group-sm ms-2 flex-shrink-0">
+                                        <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
+                                            <i class="fa fa-arrow-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" wire:click="moveElementDown({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === count($group['elements']) - 1 ? 'disabled' : '' }}>
+                                            <i class="fa fa-arrow-down"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger" wire:click="removeElement({{ $si }}, {{ $gi }}, {{ $ei }})">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-2 pt-2 border-top">
+                                    @foreach($element['configuration']['fields'] ?? [] as $fi => $field)
+                                    <div class="d-flex align-items-center justify-content-between mb-1 small">
+                                        <span>
+                                            <span class="badge bg-secondary me-1">{{ $field['type'] }}</span>
+                                            <strong>{{ $field['label'] }}</strong>
+                                            <code class="ms-1">{{ $field['name'] }}</code>
+                                            @if($field['required'] ?? false) <span class="badge bg-danger ms-1">req</span> @endif
+                                        </span>
+                                        <button type="button" class="btn btn-xs btn-outline-danger btn-sm" wire:click="removeObjectField({{ $si }}, {{ $gi }}, {{ $ei }}, {{ $fi }})">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                    @endforeach
+                                    <div class="row g-2 mt-2">
+                                        <div class="col">
+                                            <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.name" placeholder="nome_campo">
+                                        </div>
+                                        <div class="col">
+                                            <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.label" placeholder="Label">
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-select form-select-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.type">
+                                                <option value="text">text</option>
+                                                <option value="textarea">textarea</option>
+                                                <option value="select">select</option>
+                                                <option value="date">date</option>
+                                                <option value="number">number</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="form-check mt-1">
+                                                <input type="checkbox" class="form-check-input" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.required">
+                                                <label class="form-check-label small">Req.</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-sm btn-success" wire:click="addObjectField({{ $si }}, {{ $gi }}, {{ $ei }})">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @else
                             <div class="d-flex align-items-start justify-content-between border rounded p-2 mb-2 bg-light">
                                 <div>
                                     <span class="badge bg-primary me-2">{{ $element['type'] }}</span>
@@ -131,11 +199,6 @@
                                     @if($element['type'] === 'boolean_select')
                                         <div class="small text-muted mt-1">Opzioni fisse: –, SI, NO</div>
                                     @endif
-                                    @if($element['type'] === 'object' && !empty($element['configuration']['fields']))
-                                        <div class="small text-muted mt-1">
-                                            Campi: {{ collect($element['configuration']['fields'])->pluck('label')->implode(', ') }}
-                                        </div>
-                                    @endif
                                 </div>
                                 <div class="btn-group btn-group-sm ms-2 flex-shrink-0">
                                     <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
@@ -149,6 +212,7 @@
                                     </button>
                                 </div>
                             </div>
+                            @endif
                             @empty
                                 <p class="text-muted small mb-2">Nessun elemento. Aggiungine uno sotto.</p>
                             @endforelse
@@ -213,57 +277,6 @@
                                     </button>
                                 </div>
                             </div>
-
-                            <!-- Object field editor (for existing object elements) -->
-                            @foreach($group['elements'] as $ei => $element)
-                                @if($element['type'] === 'object')
-                                <div class="border rounded p-3 mt-3 bg-light">
-                                    <h6 class="mb-2">Campi di "{{ $element['label'] }}" (object)</h6>
-                                    @foreach($element['configuration']['fields'] ?? [] as $fi => $field)
-                                    <div class="d-flex align-items-center justify-content-between mb-1 small">
-                                        <span>
-                                            <span class="badge bg-secondary me-1">{{ $field['type'] }}</span>
-                                            <strong>{{ $field['label'] }}</strong>
-                                            <code class="ms-1">{{ $field['name'] }}</code>
-                                            @if($field['required'] ?? false) <span class="badge bg-danger ms-1">req</span> @endif
-                                        </span>
-                                        <button type="button" class="btn btn-xs btn-outline-danger btn-sm" wire:click="removeObjectField({{ $si }}, {{ $gi }}, {{ $ei }}, {{ $fi }})">
-                                            <i class="fa fa-times"></i>
-                                        </button>
-                                    </div>
-                                    @endforeach
-
-                                    <div class="row g-2 mt-2">
-                                        <div class="col">
-                                            <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.name" placeholder="nome_campo">
-                                        </div>
-                                        <div class="col">
-                                            <input type="text" class="form-control form-control-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.label" placeholder="Label">
-                                        </div>
-                                        <div class="col">
-                                            <select class="form-select form-select-sm" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.type">
-                                                <option value="text">text</option>
-                                                <option value="textarea">textarea</option>
-                                                <option value="select">select</option>
-                                                <option value="date">date</option>
-                                                <option value="number">number</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="form-check mt-1">
-                                                <input type="checkbox" class="form-check-input" wire:model="newElement.{{ $si }}.{{ $gi }}.obj_field.required">
-                                                <label class="form-check-label small">Req.</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <button type="button" class="btn btn-sm btn-success" wire:click="addObjectField({{ $si }}, {{ $gi }}, {{ $ei }})">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endif
-                            @endforeach
 
                         </div>
                         @endif
