@@ -368,7 +368,7 @@ class FormBuilder extends Component
         $form->steps()->whereNotIn('id', $savedStepIds)->delete();
 
         session()->flash('success', 'Form salvato con successo.');
-        $this->redirect(route('admin.forms.index'));
+        $this->redirect(route('admin.forms.edit', $form));
     }
 
     public function render()
