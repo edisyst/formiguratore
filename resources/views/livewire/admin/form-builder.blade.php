@@ -107,48 +107,94 @@
                                     <label class="form-label small text-muted">Header <span class="fw-normal">(testo introduttivo — opzionale)</span></label>
                                     <div
                                         wire:ignore
-                                        x-data="{
-                                            editor: null,
-                                            wireKey: 'steps.{{ $si }}.groups.{{ $gi }}.header',
-                                            init() {
-                                                ClassicEditor.create(this.$refs.editorEl, {
-                                                    toolbar: ['bold','italic','underline','strikethrough','|','link','|','bulletedList','numberedList','|','blockQuote','|','undo','redo'],
-                                                    language: 'it'
-                                                }).then(editor => {
-                                                    this.editor = editor;
-                                                    editor.setData(@js($group['header'] ?? ''));
-                                                    editor.model.document.on('change:data', () => {
-                                                        $wire.set(this.wireKey, editor.getData());
+                                        x-data="(() => {
+                                            let ckInstance = null;
+                                            return {
+                                                sourceMode: false,
+                                                rawHtml: '',
+                                                wireKey: 'steps.{{ $si }}.groups.{{ $gi }}.header',
+                                                init() {
+                                                    ClassicEditor.create(this.$refs.editorEl, {
+                                                        toolbar: ['bold','italic','underline','strikethrough','|','link','|','bulletedList','numberedList','|','blockQuote','|','undo','redo'],
+                                                        language: 'it'
+                                                    }).then(editor => {
+                                                        ckInstance = editor;
+                                                        editor.setData(@js($group['header'] ?? ''));
+                                                        editor.model.document.on('change:data', () => {
+                                                            $wire.set(this.wireKey, editor.getData());
+                                                        });
                                                     });
-                                                });
-                                            }
-                                        }"
+                                                },
+                                                toggleSource() {
+                                                    if (!ckInstance) return;
+                                                    if (!this.sourceMode) {
+                                                        this.rawHtml = ckInstance.getData();
+                                                        this.sourceMode = true;
+                                                    } else {
+                                                        ckInstance.setData(this.rawHtml);
+                                                        $wire.set(this.wireKey, this.rawHtml);
+                                                        this.sourceMode = false;
+                                                    }
+                                                }
+                                            };
+                                        })()"
                                     >
-                                        <div x-ref="editorEl"></div>
+                                        <div class="d-flex justify-content-end mb-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:.75rem;" @click="toggleSource()">
+                                                <i class="fa fa-code me-1"></i><span x-text="sourceMode ? 'Editor' : 'Sorgente'"></span>
+                                            </button>
+                                        </div>
+                                        <div x-show="!sourceMode"><div x-ref="editorEl"></div></div>
+                                        <div x-show="sourceMode">
+                                            <textarea class="form-control form-control-sm font-monospace" rows="5" x-model="rawHtml" style="font-size:.8rem;"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label small text-muted">Footer <span class="fw-normal">(testo conclusivo — opzionale)</span></label>
                                     <div
                                         wire:ignore
-                                        x-data="{
-                                            editor: null,
-                                            wireKey: 'steps.{{ $si }}.groups.{{ $gi }}.footer',
-                                            init() {
-                                                ClassicEditor.create(this.$refs.editorEl, {
-                                                    toolbar: ['bold','italic','underline','strikethrough','|','link','|','bulletedList','numberedList','|','blockQuote','|','undo','redo'],
-                                                    language: 'it'
-                                                }).then(editor => {
-                                                    this.editor = editor;
-                                                    editor.setData(@js($group['footer'] ?? ''));
-                                                    editor.model.document.on('change:data', () => {
-                                                        $wire.set(this.wireKey, editor.getData());
+                                        x-data="(() => {
+                                            let ckInstance = null;
+                                            return {
+                                                sourceMode: false,
+                                                rawHtml: '',
+                                                wireKey: 'steps.{{ $si }}.groups.{{ $gi }}.footer',
+                                                init() {
+                                                    ClassicEditor.create(this.$refs.editorEl, {
+                                                        toolbar: ['bold','italic','underline','strikethrough','|','link','|','bulletedList','numberedList','|','blockQuote','|','undo','redo'],
+                                                        language: 'it'
+                                                    }).then(editor => {
+                                                        ckInstance = editor;
+                                                        editor.setData(@js($group['footer'] ?? ''));
+                                                        editor.model.document.on('change:data', () => {
+                                                            $wire.set(this.wireKey, editor.getData());
+                                                        });
                                                     });
-                                                });
-                                            }
-                                        }"
+                                                },
+                                                toggleSource() {
+                                                    if (!ckInstance) return;
+                                                    if (!this.sourceMode) {
+                                                        this.rawHtml = ckInstance.getData();
+                                                        this.sourceMode = true;
+                                                    } else {
+                                                        ckInstance.setData(this.rawHtml);
+                                                        $wire.set(this.wireKey, this.rawHtml);
+                                                        this.sourceMode = false;
+                                                    }
+                                                }
+                                            };
+                                        })()"
                                     >
-                                        <div x-ref="editorEl"></div>
+                                        <div class="d-flex justify-content-end mb-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:.75rem;" @click="toggleSource()">
+                                                <i class="fa fa-code me-1"></i><span x-text="sourceMode ? 'Editor' : 'Sorgente'"></span>
+                                            </button>
+                                        </div>
+                                        <div x-show="!sourceMode"><div x-ref="editorEl"></div></div>
+                                        <div x-show="sourceMode">
+                                            <textarea class="form-control form-control-sm font-monospace" rows="5" x-model="rawHtml" style="font-size:.8rem;"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
