@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     @livewireStyles
+    <style>[x-cloak] { display: none !important; }</style>
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
 

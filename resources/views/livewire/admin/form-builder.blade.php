@@ -218,8 +218,12 @@
                             @endforelse
 
                             <!-- Add Element Form -->
-                            <div class="border rounded p-3 mt-3 bg-white">
-                                <h6 class="mb-3">Aggiungi Elemento</h6>
+                            <div class="border rounded p-3 mt-3 bg-white" x-data="{ open: false }">
+                                <h6 class="mb-0 d-flex align-items-center" style="cursor:pointer" @click="open = !open">
+                                    <i class="fa me-2" :class="open ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+                                    Aggiungi Elemento
+                                </h6>
+                                <div x-show="open" x-cloak class="mt-3">
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label small"><span class="text-danger">*</span> Tipo</label>
@@ -276,6 +280,7 @@
                                         <i class="fa fa-plus me-1"></i> Aggiungi Elemento
                                     </button>
                                 </div>
+                                </div>{{-- /x-show --}}
                             </div>
 
                         </div>
