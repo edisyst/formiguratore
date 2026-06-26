@@ -97,19 +97,19 @@
                         @if($openGroups[$si][$gi] ?? false)
                         <div class="card-body">
 
-                            <!-- Group meta (header/footer) -->
-                            <div class="row g-2 mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small">Titolo gruppo *</label>
+                            <!-- Group meta (title / header / footer) -->
+                            <div class="mb-3">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-semibold">Titolo gruppo *</label>
                                     <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.title" placeholder="Titolo del gruppo">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">Header (opzionale)</label>
-                                    <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.header" placeholder="Testo introduttivo">
+                                <div class="mb-2">
+                                    <label class="form-label small text-muted">Header <span class="fw-normal">(testo introduttivo — opzionale)</span></label>
+                                    <textarea class="form-control form-control-sm" rows="2" wire:model="steps.{{ $si }}.groups.{{ $gi }}.header" placeholder="Testo mostrato prima degli elementi del gruppo..."></textarea>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">Footer (opzionale)</label>
-                                    <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.footer" placeholder="Testo conclusivo">
+                                <div class="mb-2">
+                                    <label class="form-label small text-muted">Footer <span class="fw-normal">(testo conclusivo — opzionale)</span></label>
+                                    <textarea class="form-control form-control-sm" rows="2" wire:model="steps.{{ $si }}.groups.{{ $gi }}.footer" placeholder="Testo mostrato dopo gli elementi del gruppo..."></textarea>
                                 </div>
                             </div>
 

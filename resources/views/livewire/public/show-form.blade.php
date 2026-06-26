@@ -113,7 +113,7 @@
                         </div>
 
                         @if($group->header)
-                            <p class="group-card-header">{{ $group->header }}</p>
+                            <div class="group-card-header">{!! $group->header !!}</div>
                         @endif
 
                         <div class="group-card-body">
@@ -243,7 +243,7 @@
                         </div>
 
                         @if($group->footer)
-                            <p class="group-card-footer">{{ $group->footer }}</p>
+                            <div class="group-card-footer">{!! $group->footer !!}</div>
                         @endif
 
                     </div>
