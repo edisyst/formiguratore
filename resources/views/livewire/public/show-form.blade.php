@@ -1,3 +1,4 @@
+<div>
 <style>
 .group-card {
     border: 1px solid #dee2e6;
@@ -52,7 +53,7 @@
 .action-link-primary { color: #1a56a0; text-decoration: none; font-size: .875rem; }
 .action-link-primary:hover { text-decoration: underline; }
 
-/* Compact modal */
+/* Modal */
 .modal-header-blue {
     background-color: #1a56a0;
     color: #fff;
@@ -62,16 +63,17 @@
 .modal-header-blue .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
 }
-.modal-compact .modal-body {
+.modal-body.modal-compact {
     padding: 1rem 1.25rem 0.5rem;
 }
-.modal-compact .modal-footer {
+.modal-footer.modal-compact {
     padding: 0.5rem 1.25rem 0.75rem;
     border-top: none;
     justify-content: flex-start;
 }
-.modal-compact .form-control,
-.modal-compact .form-select {
+.modal-body.modal-compact .form-control,
+.modal-body.modal-compact .form-select,
+.modal-body.modal-compact .ts-wrapper .ts-control {
     border-radius: 2px;
 }
 .modal-field-label {
@@ -80,7 +82,6 @@
 }
 </style>
 
-<div>
     <h2 class="mb-1">{{ $form->name }}</h2>
     @if($form->description)
         <p class="text-muted mb-4">{{ $form->description }}</p>
@@ -144,8 +145,9 @@
                                                         <td>{{ $record->data[$field['name']] ?? '–' }}</td>
                                                     @endforeach
                                                     <td class="text-nowrap">
-                                                        <button type="button" class="action-link-danger btn btn-link p-0 me-2" wire:click="deleteRecord({{ $record->id }})"
-                                                                onclick="return confirm('Eliminare questo record?')">
+                                                        <button type="button" class="action-link-danger btn btn-link p-0 me-2"
+                                                                wire:click="deleteRecord({{ $record->id }})"
+                                                                wire:confirm="Eliminare questo record?">
                                                             <i class="fa fa-times me-1"></i>Elimina
                                                         </button>
                                                         <button type="button" class="action-link-primary btn btn-link p-0" wire:click="openModal({{ $element->id }}, {{ $record->id }})">
@@ -260,37 +262,45 @@
     <!-- Object Record Modal -->
     @if($showModal)
     @php
-        $el = $form->steps
+        $modalEl = $form->steps
             ->flatMap(fn($s) => $s->groups)
             ->flatMap(fn($g) => $g->elements)
             ->firstWhere('id', $editingElementId);
-        $fields = $el ? ($el->configuration['fields'] ?? []) : [];
+        $modalFields = $modalEl ? ($modalEl->configuration['fields'] ?? []) : [];
     @endphp
-    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
-        <div class="modal-dialog modal-compact" style="max-width:500px;">
+    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5); z-index:1055;">
+        <div class="modal-dialog" style="max-width:500px;">
             <div class="modal-content" style="border-radius:2px;">
                 <div class="modal-header-blue d-flex justify-content-between align-items-center">
-                    <span style="font-size:1rem; font-weight:600;">{{ $el?->label }}</span>
+                    <span style="font-size:1rem; font-weight:600;">{{ $modalEl?->label }}</span>
                     <button type="button" class="btn-close btn-close-white" wire:click="closeModal" aria-label="Chiudi"></button>
                 </div>
                 <div class="modal-body modal-compact">
-                    @foreach($fields as $field)
+                    @foreach($modalFields as $field)
                     <div class="mb-3">
                         <div class="modal-field-label">
                             @if($field['required'] ?? false) <span class="text-danger me-1">*</span> @endif
                             {{ $field['label'] }}
                         </div>
                         @if(($field['type'] ?? 'text') === 'textarea')
-                            <textarea class="form-control form-control-sm" wire:model="modalData.{{ $field['name'] }}" rows="3"></textarea>
+                            <textarea class="form-control form-control-sm"
+                                      wire:model="modalData.{{ $field['name'] }}" rows="3"></textarea>
                         @elseif(($field['type'] ?? 'text') === 'select')
-                            <select class="form-select form-select-sm" wire:model="modalData.{{ $field['name'] }}">
-                                <option value="">Seleziona...</option>
-                                @foreach($field['options'] ?? [] as $opt)
-                                    <option>{{ $opt }}</option>
-                                @endforeach
-                            </select>
+                            <div wire:ignore>
+                                <select class="form-select form-select-sm modal-ts-select"
+                                        id="ts-{{ $field['name'] }}"
+                                        data-livewire-field="{{ $field['name'] }}"
+                                        data-livewire-value="{{ $modalData[$field['name']] ?? '' }}">
+                                    <option value="">Seleziona...</option>
+                                    @foreach($field['options'] ?? [] as $opt)
+                                        <option value="{{ $opt }}" {{ ($modalData[$field['name']] ?? '') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         @else
-                            <input type="{{ $field['type'] ?? 'text' }}" class="form-control form-control-sm" wire:model="modalData.{{ $field['name'] }}">
+                            <input type="{{ $field['type'] ?? 'text' }}"
+                                   class="form-control form-control-sm"
+                                   wire:model="modalData.{{ $field['name'] }}">
                         @endif
                     </div>
                     @endforeach
@@ -304,4 +314,38 @@
         </div>
     </div>
     @endif
+
 </div>
+
+<script>
+(function () {
+    function initModalSelects() {
+        document.querySelectorAll('.modal-ts-select').forEach(function (el) {
+            if (el.tomselect) {
+                el.tomselect.destroy();
+            }
+            var fieldName = el.dataset.livewireField;
+            var initialValue = el.dataset.livewireValue;
+            var ts = new TomSelect(el, {
+                plugins: ['clear_button'],
+                placeholder: 'Seleziona...',
+                onChange: function (value) {
+                    var component = Livewire.find(el.closest('[wire\\:id]').getAttribute('wire:id'));
+                    if (component) {
+                        component.set('modalData.' + fieldName, value);
+                    }
+                },
+            });
+            if (initialValue) {
+                ts.setValue(initialValue, true);
+            }
+        });
+    }
+
+    document.addEventListener('livewire:initialized', function () {
+        Livewire.on('modal-ready', function () {
+            setTimeout(initModalSelects, 30);
+        });
+    });
+})();
+</script>

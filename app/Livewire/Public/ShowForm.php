@@ -33,6 +33,7 @@ class ShowForm extends Component
         }
 
         $this->showModal = true;
+        $this->dispatch('modal-ready');
     }
 
     public function closeModal(): void
