@@ -92,14 +92,14 @@
         @forelse($form->steps as $si => $step)
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button {{ $si === 0 ? '' : 'collapsed' }}"
+                <button class="accordion-button {{ $step->id === $openStepId ? '' : 'collapsed' }}"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#step-{{ $step->id }}">
                     Step {{ $si + 1 }}: {{ $step->title }}
                 </button>
             </h2>
-            <div id="step-{{ $step->id }}" class="accordion-collapse collapse {{ $si === 0 ? 'show' : '' }}" data-bs-parent="#formAccordion">
+            <div id="step-{{ $step->id }}" class="accordion-collapse collapse {{ $step->id === $openStepId ? 'show' : '' }}" data-bs-parent="#formAccordion">
                 <div class="accordion-body">
 
                     @forelse($step->groups as $gi => $group)
@@ -319,6 +319,7 @@
 
 <script>
 (function () {
+    /* ── Tom Select ─────────────────────────────────────────────────── */
     function initModalSelects() {
         document.querySelectorAll('.modal-ts-select').forEach(function (el) {
             if (el.tomselect) {
@@ -342,9 +343,27 @@
         });
     }
 
+    /* ── Save/restore scroll across Livewire updates ────────────────── */
+    var savedScrollY = 0;
+    document.addEventListener('livewire:request', function () {
+        savedScrollY = window.scrollY;
+    });
+    document.addEventListener('livewire:commit', function () {
+        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+    });
+
+    /* ── Sync accordion open state to Livewire ──────────────────────── */
     document.addEventListener('livewire:initialized', function () {
         Livewire.on('modal-ready', function () {
             setTimeout(initModalSelects, 30);
+        });
+
+        document.getElementById('formAccordion')?.addEventListener('shown.bs.collapse', function (e) {
+            var stepId = parseInt(e.target.id.replace('step-', ''));
+            if (!isNaN(stepId)) {
+                var component = Livewire.find(e.target.closest('[wire\\:id]').getAttribute('wire:id'));
+                if (component) component.set('openStepId', stepId);
+            }
         });
     });
 })();

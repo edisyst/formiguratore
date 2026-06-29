@@ -16,9 +16,17 @@ class ShowForm extends Component
     public ?int $editingRecordId = null;
     public array $modalData = [];
 
+    public ?int $openStepId = null;
+
     public function mount(Form $form): void
     {
         $this->form = $form->load('steps.groups.elements.objectRecords');
+        $this->openStepId = $form->steps->first()?->id;
+    }
+
+    public function setOpenStep(int $stepId): void
+    {
+        $this->openStepId = $stepId;
     }
 
     public function openModal(int $elementId, ?int $recordId = null): void
