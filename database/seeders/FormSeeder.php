@@ -416,7 +416,9 @@ class FormSeeder extends Seeder
         Element::create(['group_id' => $grpF7c->id, 'name' => 'accetto_privacy', 'type' => 'checkbox', 'label' => 'Accetto l\'informativa sulla privacy', 'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
 
 
-        // ── Form 2: Tecnici progettisti e assimilati ──────────────────────
+        // ══════════════════════════════════════════════════════════════════════
+        // ██  FORM 2 — TECNICI PROGETTISTI E ASSIMILATI (PT)
+        // ══════════════════════════════════════════════════════════════════════
         $form5 = Form::create([
             'name'        => 'Tecnici progettisti e assimilati',
             'slug'        => 'tecnici-progettisti-assimilati',
@@ -630,5 +632,141 @@ class FormSeeder extends Seeder
 
         $grp5d7 = Group::create(['step_id' => $step5d->id, 'title' => 'Privacy e termini', 'header' => null, 'footer' => null, 'order' => 6]);
         Element::create(['group_id' => $grp5d7->id, 'name' => 'accettazione_privacy', 'type' => 'checkbox', 'label' => 'Prendete visione di quanto riportato e accettate integralmente l\'informativa privacy consultabile al seguente link Privacy e Termini', 'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+
+        // ══════════════════════════════════════════════════════════════════════
+        // ██  FORM 3 — PROFESSIONISTI NON TECNICI (PNT)
+        // ══════════════════════════════════════════════════════════════════════
+        $formPnt = Form::create([
+            'name'        => 'Professionisti non tecnici',
+            'slug'        => 'professionisti-non-tecnici',
+            'description' => 'Modulo di dichiarazione per professionisti non tecnici ai fini della partecipazione a procedure di affidamento.',
+        ]);
+
+        // ── Step 1: Dichiarante ────────────────────────────────────────────
+        $stepPnt1 = Step::create(['form_id' => $formPnt->id, 'title' => 'Dichiarante', 'order' => 0]);
+
+        $grpPnt1a = Group::create(['step_id' => $stepPnt1->id, 'title' => 'Dichiarante', 'header' => null, 'footer' => null, 'order' => 0]);
+        Element::create(['group_id' => $grpPnt1a->id, 'name' => 'nome',           'type' => 'text', 'label' => 'Nome',           'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1a->id, 'name' => 'cognome',        'type' => 'text', 'label' => 'Cognome',        'placeholder' => null, 'required' => true,  'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1a->id, 'name' => 'codice_fiscale', 'type' => 'text', 'label' => 'Codice fiscale', 'placeholder' => null, 'required' => true,  'order' => 2, 'configuration' => null]);
+
+        $grpPnt1b = Group::create(['step_id' => $stepPnt1->id, 'title' => 'Luogo e data di nascita', 'header' => null, 'footer' => null, 'order' => 1]);
+        Element::create(['group_id' => $grpPnt1b->id, 'name' => 'data_di_nascita', 'type' => 'date', 'label' => 'Data di nascita', 'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1b->id, 'name' => 'nazione',         'type' => 'text', 'label' => 'Nazione',         'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1b->id, 'name' => 'provincia',       'type' => 'text', 'label' => 'Provincia',       'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1b->id, 'name' => 'citta',           'type' => 'text', 'label' => 'Città',           'placeholder' => null, 'required' => true, 'order' => 3, 'configuration' => null]);
+
+        $grpPnt1c = Group::create(['step_id' => $stepPnt1->id, 'title' => 'Residenza', 'header' => null, 'footer' => null, 'order' => 2]);
+        Element::create(['group_id' => $grpPnt1c->id, 'name' => 'nazione_di_residenza',   'type' => 'text', 'label' => 'Nazione di residenza',   'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1c->id, 'name' => 'indirizzo_di_residenza', 'type' => 'text', 'label' => 'Indirizzo di residenza', 'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1c->id, 'name' => 'provincia_residenza',    'type' => 'text', 'label' => 'Provincia',              'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1c->id, 'name' => 'citta_residenza',        'type' => 'text', 'label' => 'Città',                  'placeholder' => null, 'required' => true, 'order' => 3, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1c->id, 'name' => 'cap',                    'type' => 'text', 'label' => 'CAP',                    'placeholder' => null, 'required' => true, 'order' => 4, 'configuration' => null]);
+
+        $grpPnt1d = Group::create(['step_id' => $stepPnt1->id, 'title' => 'Dichiarazione Art. 1, Comma 9, Lettera E - Legge 190/2012', 'header' => null, 'footer' => null, 'order' => 3]);
+        Element::create(['group_id' => $grpPnt1d->id, 'name' => 'parentela_affinita',           'type' => 'boolean_select', 'label' => 'Per quanto a propria conoscenza, sussistono relazioni di parentela o affinità, tra i titolari, gli amministratori, i soci e i dipendenti dell\'impresa e i dirigenti e i dipendenti dell\'Amministrazione Aggiudicatrice?', 'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt1d->id, 'name' => 'relazioni_parentela_affinita', 'type' => 'textarea',       'label' => 'Se sì, indicare di seguito le relazioni di parentela o affinità',                                                                                                                                                         'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
+
+        // ── Step 2: Dati attività ──────────────────────────────────────────
+        $stepPnt2 = Step::create(['form_id' => $formPnt->id, 'title' => 'Dati attività', 'order' => 1]);
+
+        $grpPnt2a = Group::create(['step_id' => $stepPnt2->id, 'title' => 'Dati attività', 'header' => null, 'footer' => null, 'order' => 0]);
+        Element::create(['group_id' => $grpPnt2a->id, 'name' => 'ragione_sociale',             'type' => 'text', 'label' => 'Ragione sociale/Nome e Cognome',       'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt2a->id, 'name' => 'agenzia_stazione_competenza', 'type' => 'text', 'label' => 'Agenzia della Stazione di competenza', 'placeholder' => null, 'required' => true,  'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grpPnt2a->id, 'name' => 'sito_web',                   'type' => 'text', 'label' => 'Sito Web',                             'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
+
+        $grpPnt2b = Group::create(['step_id' => $stepPnt2->id, 'title' => 'Contatti principali', 'header' => null, 'footer' => null, 'order' => 1]);
+        Element::create([
+            'group_id'      => $grpPnt2b->id,
+            'name'          => 'contatti',
+            'type'          => 'object',
+            'label'         => 'Contatti principali',
+            'placeholder'   => null,
+            'required'      => true,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'tipo',        'label' => 'Tipo',        'type' => 'select', 'required' => true,  'options' => ['Telefono Fisso', 'Telefono Cellulare', 'Email', 'Pec']],
+                    ['name' => 'valore',      'label' => 'Valore',      'type' => 'text',   'required' => true],
+                    ['name' => 'descrizione', 'label' => 'Descrizione', 'type' => 'text',   'required' => false],
+                    ['name' => 'principale',  'label' => 'Principale',  'type' => 'select', 'required' => false, 'options' => ['Sì', 'No']],
+                ],
+            ],
+        ]);
+
+        $grpPnt2c = Group::create(['step_id' => $stepPnt2->id, 'title' => 'Sedi', 'header' => null, 'footer' => null, 'order' => 2]);
+        Element::create([
+            'group_id'      => $grpPnt2c->id,
+            'name'          => 'sedi',
+            'type'          => 'object',
+            'label'         => 'Sedi',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'sede_legale',    'label' => 'Sede Legale',    'type' => 'select', 'required' => false, 'options' => ['Sì', 'No']],
+                    ['name' => 'sede_operativa', 'label' => 'Sede Operativa', 'type' => 'select', 'required' => false, 'options' => ['Sì', 'No']],
+                    ['name' => 'regione',        'label' => 'Regione',        'type' => 'text',   'required' => false],
+                    ['name' => 'provincia',      'label' => 'Provincia',      'type' => 'text',   'required' => false],
+                    ['name' => 'comune',         'label' => 'Comune',         'type' => 'text',   'required' => false],
+                    ['name' => 'cf_iva',         'label' => 'CF/IVA',         'type' => 'text',   'required' => false],
+                    ['name' => 'indirizzo',      'label' => 'Indirizzo',      'type' => 'text',   'required' => false],
+                    ['name' => 'cap',            'label' => 'CAP',            'type' => 'text',   'required' => false],
+                    ['name' => 'telefono',       'label' => 'Telefono',       'type' => 'text',   'required' => false],
+                ],
+            ],
+        ]);
+
+        $grpPnt2d = Group::create(['step_id' => $stepPnt2->id, 'title' => 'Polizze professionali', 'header' => null, 'footer' => null, 'order' => 3]);
+        Element::create([
+            'group_id'      => $grpPnt2d->id,
+            'name'          => 'polizze_professionali',
+            'type'          => 'object',
+            'label'         => 'Polizze professionali',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'compagnia',     'label' => 'Compagnia',      'type' => 'text', 'required' => false],
+                    ['name' => 'numero_polizza','label' => 'Numero polizza',  'type' => 'text', 'required' => false],
+                    ['name' => 'massimale',     'label' => 'Massimale (€)',   'type' => 'text', 'required' => false],
+                    ['name' => 'scadenza',      'label' => 'Scadenza',        'type' => 'date', 'required' => false],
+                ],
+            ],
+        ]);
+
+        // ── Step 3: Certificazioni e abilitazioni ──────────────────────────
+        $stepPnt3 = Step::create(['form_id' => $formPnt->id, 'title' => 'Certificazioni e abilitazioni', 'order' => 2]);
+
+        $grpPnt3a = Group::create(['step_id' => $stepPnt3->id, 'title' => 'Certificazioni', 'header' => null, 'footer' => null, 'order' => 0]);
+        Element::create([
+            'group_id'      => $grpPnt3a->id,
+            'name'          => 'certificazioni',
+            'type'          => 'object',
+            'label'         => 'Certificazioni',
+            'placeholder'   => null,
+            'required'      => false,
+            'order'         => 0,
+            'configuration' => [
+                'fields' => [
+                    ['name' => 'tipo_certificazione', 'label' => 'Tipo certificazione', 'type' => 'text', 'required' => true],
+                    ['name' => 'ente_certificatore',  'label' => 'Ente certificatore',  'type' => 'text', 'required' => false],
+                    ['name' => 'numero',              'label' => 'Numero',              'type' => 'text', 'required' => false],
+                    ['name' => 'scadenza',            'label' => 'Scadenza',            'type' => 'date', 'required' => false],
+                    ['name' => 'allegato',            'label' => 'Allegato',            'type' => 'file', 'required' => false],
+                ],
+            ],
+        ]);
+
+        // ── Step 4: Ulteriore documentazione ──────────────────────────────
+        $stepPnt4 = Step::create(['form_id' => $formPnt->id, 'title' => 'Ulteriore documentazione', 'order' => 3]);
+
+        $grpPnt4a = Group::create(['step_id' => $stepPnt4->id, 'title' => 'Documentazione integrativa', 'header' => 'Di seguito è possibile allegare eventuali documenti integrativi alla scheda di iscrizione.', 'footer' => null, 'order' => 0]);
+        Element::create(['group_id' => $grpPnt4a->id, 'name' => 'documentazione_integrativa', 'type' => 'file', 'label' => 'Documentazione integrativa', 'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
+
+        $grpPnt4b = Group::create(['step_id' => $stepPnt4->id, 'title' => 'Privacy e termini', 'header' => null, 'footer' => null, 'order' => 1]);
+        Element::create(['group_id' => $grpPnt4b->id, 'name' => 'accettazione_privacy', 'type' => 'checkbox', 'label' => 'Prendete visione di quanto riportato e accettate integralmente l\'informativa privacy consultabile al seguente link Privacy e Termini', 'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
     }
 }
