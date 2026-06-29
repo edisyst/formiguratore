@@ -453,20 +453,20 @@ class FormSeeder extends Seeder
 
         $grp5b1 = Group::create(['step_id' => $step5b->id, 'title' => 'Dati attività', 'header' => null, 'footer' => null, 'order' => 0]);
         Element::create(['group_id' => $grp5b1->id, 'name' => 'ragione_sociale',             'type' => 'text', 'label' => 'Ragione sociale/Nome e Cognome',       'placeholder' => null, 'required' => true,  'order' => 0, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b1->id, 'name' => 'agenzia_stazione_competenza', 'type' => 'text', 'label' => 'Agenzia della Stazione di competenza', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b1->id, 'name' => 'sito_web',                   'type' => 'text', 'label' => 'Sito Web',                             'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b1->id, 'name' => 'agenzia_stazione_competenza', 'type' => 'text', 'label' => 'Agenzia della Stazione di competenza', 'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b1->id, 'name' => 'sito_web',                   'type' => 'text', 'label' => 'Sito Web',                             'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
 
         $grp5b2 = Group::create(['step_id' => $step5b->id, 'title' => 'Tribunale di competenza', 'header' => null, 'footer' => null, 'order' => 1]);
-        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_nazione',   'type' => 'text', 'label' => 'Nazione',   'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_provincia', 'type' => 'text', 'label' => 'Provincia', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_comune',    'type' => 'text', 'label' => 'Comune',    'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_indirizzo', 'type' => 'text', 'label' => 'Indirizzo', 'placeholder' => null, 'required' => false, 'order' => 3, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_nazione',   'type' => 'text', 'label' => 'Nazione',   'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_provincia', 'type' => 'text', 'label' => 'Provincia', 'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_comune',    'type' => 'text', 'label' => 'Comune',    'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b2->id, 'name' => 'tribunale_indirizzo', 'type' => 'text', 'label' => 'Indirizzo', 'placeholder' => null, 'required' => true, 'order' => 3, 'configuration' => null]);
 
         $grp5b3 = Group::create(['step_id' => $step5b->id, 'title' => 'Ispettorato territoriale del lavoro di competenza', 'header' => null, 'footer' => null, 'order' => 2]);
-        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_nazione',   'type' => 'text', 'label' => 'Nazione',   'placeholder' => null, 'required' => false, 'order' => 0, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_provincia', 'type' => 'text', 'label' => 'Provincia', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_comune',    'type' => 'text', 'label' => 'Comune',    'placeholder' => null, 'required' => false, 'order' => 2, 'configuration' => null]);
-        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_indirizzo', 'type' => 'text', 'label' => 'Indirizzo', 'placeholder' => null, 'required' => false, 'order' => 3, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_nazione',   'type' => 'text', 'label' => 'Nazione',   'placeholder' => null, 'required' => true, 'order' => 0, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_provincia', 'type' => 'text', 'label' => 'Provincia', 'placeholder' => null, 'required' => true, 'order' => 1, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_comune',    'type' => 'text', 'label' => 'Comune',    'placeholder' => null, 'required' => true, 'order' => 2, 'configuration' => null]);
+        Element::create(['group_id' => $grp5b3->id, 'name' => 'ispettorato_indirizzo', 'type' => 'text', 'label' => 'Indirizzo', 'placeholder' => null, 'required' => true, 'order' => 3, 'configuration' => null]);
 
         $grp5b4 = Group::create(['step_id' => $step5b->id, 'title' => 'Contatti principali', 'header' => null, 'footer' => null, 'order' => 3]);
         Element::create([
