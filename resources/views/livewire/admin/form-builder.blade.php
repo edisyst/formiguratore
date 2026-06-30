@@ -201,8 +201,44 @@
 
                             <!-- Element list -->
                             @forelse($group['elements'] as $ei => $element)
+                            @php $elOpen = $openElements[$si][$gi][$ei] ?? false; @endphp
                             @if($element['type'] === 'object')
-                            <div class="border rounded p-2 mb-2 bg-light">
+                            <div class="border rounded p-2 mb-2 bg-light" wire:key="el-{{ $si }}-{{ $gi }}-{{ $ei }}">
+                                {{-- Object header: view or edit --}}
+                                @if($elOpen)
+                                <div class="row g-2 mb-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Label *</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.label">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Name *</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.name">
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check mb-1">
+                                            <input type="checkbox" class="form-check-input" id="req-obj-{{ $si }}-{{ $gi }}-{{ $ei }}" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.required">
+                                            <label class="form-check-label small" for="req-obj-{{ $si }}-{{ $gi }}-{{ $ei }}">Req.</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto ms-auto">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-primary" wire:click="toggleElement({{ $si }}, {{ $gi }}, {{ $ei }})" title="Chiudi">
+                                                <i class="fa fa-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
+                                                <i class="fa fa-arrow-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" wire:click="moveElementDown({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === count($group['elements']) - 1 ? 'disabled' : '' }}>
+                                                <i class="fa fa-arrow-down"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger" wire:click="removeElement({{ $si }}, {{ $gi }}, {{ $ei }})">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
                                 <div class="d-flex align-items-start justify-content-between">
                                     <div>
                                         <span class="badge bg-primary me-2">object</span>
@@ -213,6 +249,9 @@
                                         @endif
                                     </div>
                                     <div class="btn-group btn-group-sm ms-2 flex-shrink-0">
+                                        <button type="button" class="btn btn-outline-primary" wire:click="toggleElement({{ $si }}, {{ $gi }}, {{ $ei }})" title="Modifica">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
                                         <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
                                             <i class="fa fa-arrow-up"></i>
                                         </button>
@@ -224,6 +263,8 @@
                                         </button>
                                     </div>
                                 </div>
+                                @endif
+                                {{-- Sub-fields (always visible) --}}
                                 <div class="mt-2 pt-2 border-top">
                                     @foreach($element['configuration']['fields'] ?? [] as $fi => $field)
                                     <div class="d-flex align-items-center justify-content-between mb-1 small">
@@ -269,34 +310,110 @@
                                 </div>
                             </div>
                             @else
-                            <div class="d-flex align-items-start justify-content-between border rounded p-2 mb-2 bg-light">
-                                <div>
-                                    <span class="badge bg-primary me-2">{{ $element['type'] }}</span>
-                                    <strong>{{ $element['label'] }}</strong>
-                                    <code class="ms-2 small">{{ $element['name'] }}</code>
-                                    @if($element['required'])
-                                        <span class="badge bg-danger ms-1">required</span>
-                                    @endif
-                                    @if($element['type'] === 'select' && !empty($element['configuration']['options']))
-                                        <div class="small text-muted mt-1">
-                                            Opzioni: {{ implode(', ', $element['configuration']['options']) }}
+                            <div class="border rounded p-2 mb-2 {{ $elOpen ? 'bg-white border-primary border-2' : 'bg-light' }}" wire:key="el-{{ $si }}-{{ $gi }}-{{ $ei }}">
+                                @if($elOpen)
+                                {{-- EDIT MODE --}}
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Tipo</label>
+                                        <select class="form-select form-select-sm" wire:model.live="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.type">
+                                            <option value="text">Text</option>
+                                            <option value="textarea">Textarea</option>
+                                            <option value="select">Select</option>
+                                            <option value="boolean_select">Boolean Select</option>
+                                            <option value="checkbox">Checkbox</option>
+                                            <option value="file">File</option>
+                                            <option value="date">Date</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Label *</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.label">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Name *</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.name">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Placeholder</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.placeholder">
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check mb-1">
+                                            <input type="checkbox" class="form-check-input" id="req-el-{{ $si }}-{{ $gi }}-{{ $ei }}" wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.required">
+                                            <label class="form-check-label small" for="req-el-{{ $si }}-{{ $gi }}-{{ $ei }}">Req.</label>
                                         </div>
-                                    @endif
-                                    @if($element['type'] === 'boolean_select')
-                                        <div class="small text-muted mt-1">Opzioni fisse: –, SI, NO</div>
-                                    @endif
+                                    </div>
+                                    <div class="col-auto ms-auto">
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-primary" wire:click="toggleElement({{ $si }}, {{ $gi }}, {{ $ei }})" title="Chiudi">
+                                                <i class="fa fa-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
+                                                <i class="fa fa-arrow-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" wire:click="moveElementDown({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === count($group['elements']) - 1 ? 'disabled' : '' }}>
+                                                <i class="fa fa-arrow-down"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger" wire:click="removeElement({{ $si }}, {{ $gi }}, {{ $ei }})">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="btn-group btn-group-sm ms-2 flex-shrink-0">
-                                    <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
-                                        <i class="fa fa-arrow-up"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary" wire:click="moveElementDown({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === count($group['elements']) - 1 ? 'disabled' : '' }}>
-                                        <i class="fa fa-arrow-down"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger" wire:click="removeElement({{ $si }}, {{ $gi }}, {{ $ei }})">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
+                                @if($element['type'] === 'select')
+                                <div class="mt-2"
+                                    x-data="{
+                                        raw: @js(implode("\n", $element['configuration']['options'] ?? [])),
+                                        update() {
+                                            const lines = this.raw.split('\n').map(s => s.trim()).filter(s => s !== '');
+                                            $wire.set('steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.configuration.options', lines);
+                                        }
+                                    }">
+                                    <label class="form-label small">Opzioni (una per riga)</label>
+                                    <textarea class="form-control form-control-sm" rows="3" x-model="raw" @input.debounce.300ms="update()"></textarea>
                                 </div>
+                                @endif
+                                @if($element['type'] === 'boolean_select')
+                                <div class="mt-2">
+                                    <p class="text-muted small mb-0"><i class="fa fa-info-circle me-1"></i>Opzioni fisse: <strong>–</strong>, <strong>SI</strong>, <strong>NO</strong></p>
+                                </div>
+                                @endif
+                                @else
+                                {{-- VIEW MODE --}}
+                                <div class="d-flex align-items-start justify-content-between">
+                                    <div>
+                                        <span class="badge bg-primary me-2">{{ $element['type'] }}</span>
+                                        <strong>{{ $element['label'] }}</strong>
+                                        <code class="ms-2 small">{{ $element['name'] }}</code>
+                                        @if($element['required'])
+                                            <span class="badge bg-danger ms-1">required</span>
+                                        @endif
+                                        @if($element['type'] === 'select' && !empty($element['configuration']['options']))
+                                            <div class="small text-muted mt-1">
+                                                Opzioni: {{ implode(', ', $element['configuration']['options']) }}
+                                            </div>
+                                        @endif
+                                        @if($element['type'] === 'boolean_select')
+                                            <div class="small text-muted mt-1">Opzioni fisse: –, SI, NO</div>
+                                        @endif
+                                    </div>
+                                    <div class="btn-group btn-group-sm ms-2 flex-shrink-0">
+                                        <button type="button" class="btn btn-outline-primary" wire:click="toggleElement({{ $si }}, {{ $gi }}, {{ $ei }})" title="Modifica">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" wire:click="moveElementUp({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === 0 ? 'disabled' : '' }}>
+                                            <i class="fa fa-arrow-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" wire:click="moveElementDown({{ $si }}, {{ $gi }}, {{ $ei }})" {{ $ei === count($group['elements']) - 1 ? 'disabled' : '' }}>
+                                            <i class="fa fa-arrow-down"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger" wire:click="removeElement({{ $si }}, {{ $gi }}, {{ $ei }})">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
                             @endif
                             @empty

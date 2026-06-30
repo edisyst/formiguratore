@@ -26,6 +26,7 @@ class FormBuilder extends Component
 
     public array $openSteps = [];
     public array $openGroups = []; // [si][gi]
+    public array $openElements = []; // [si][gi][ei]
 
     public function mount(?Form $form = null): void
     {
@@ -55,7 +56,7 @@ class FormBuilder extends Component
                             'configuration' => $e->configuration ?? [],
                         ])->toArray(),
                     ];
-                    $this->openGroups[$si][$gi] = true;
+                    $this->openGroups[$si][$gi] = false;
                 }
 
                 $this->steps[] = [
@@ -64,7 +65,7 @@ class FormBuilder extends Component
                     'order'  => $step->order,
                     'groups' => $groups,
                 ];
-                $this->openSteps[$si] = true;
+                $this->openSteps[$si] = false;
             }
         }
     }
@@ -273,6 +274,11 @@ class FormBuilder extends Component
         ];
 
         $this->newElement[$si][$gi]['obj_field'] = [];
+    }
+
+    public function toggleElement(int $si, int $gi, int $ei): void
+    {
+        $this->openElements[$si][$gi][$ei] = !($this->openElements[$si][$gi][$ei] ?? false);
     }
 
     public function removeObjectField(int $si, int $gi, int $ei, int $fi): void
