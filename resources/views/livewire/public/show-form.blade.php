@@ -297,6 +297,13 @@
                                     @endforeach
                                 </select>
                             </div>
+                        @elseif(($field['type'] ?? 'text') === 'file')
+                            <input type="file"
+                                   class="form-control form-control-sm"
+                                   onchange="@this.set('modalData.{{ $field['name'] }}', this.files[0]?.name ?? '')">
+                            @if(!empty($modalData[$field['name']]))
+                                <div class="small text-muted mt-1">{{ $modalData[$field['name']] }}</div>
+                            @endif
                         @else
                             <input type="{{ $field['type'] ?? 'text' }}"
                                    class="form-control form-control-sm"
