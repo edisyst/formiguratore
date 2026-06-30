@@ -344,6 +344,16 @@
                                             <label class="form-check-label small" for="req-el-{{ $si }}-{{ $gi }}-{{ $ei }}">Req.</label>
                                         </div>
                                     </div>
+                                    @if($element['type'] === 'file')
+                                    <div class="col-auto">
+                                        <div class="form-check mb-1">
+                                            <input type="checkbox" class="form-check-input"
+                                                   id="con-scadenza-{{ $si }}-{{ $gi }}-{{ $ei }}"
+                                                   wire:model="steps.{{ $si }}.groups.{{ $gi }}.elements.{{ $ei }}.configuration.con_scadenza">
+                                            <label class="form-check-label small" for="con-scadenza-{{ $si }}-{{ $gi }}-{{ $ei }}">Con scad.</label>
+                                        </div>
+                                    </div>
+                                    @endif
                                     <div class="col-auto ms-auto">
                                         <div class="btn-group btn-group-sm">
                                             <button type="button" class="btn btn-primary" wire:click="toggleElement({{ $si }}, {{ $gi }}, {{ $ei }})" title="Chiudi">
@@ -396,6 +406,9 @@
                                         @endif
                                         @if($element['type'] === 'boolean_select')
                                             <div class="small text-muted mt-1">Opzioni fisse: –, SI, NO</div>
+                                        @endif
+                                        @if($element['type'] === 'file' && ($element['configuration']['con_scadenza'] ?? false))
+                                            <span class="badge bg-info ms-1">con scadenza</span>
                                         @endif
                                     </div>
                                     <div class="btn-group btn-group-sm ms-2 flex-shrink-0">
@@ -457,6 +470,16 @@
                                             <label class="form-check-label" for="req-{{ $si }}-{{ $gi }}">Obbligatorio</label>
                                         </div>
                                     </div>
+                                    @if(($newElement[$si][$gi]['type'] ?? 'text') === 'file')
+                                    <div class="col-auto">
+                                        <div class="form-check mt-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   wire:model="newElement.{{ $si }}.{{ $gi }}.file_con_scadenza"
+                                                   id="new-con-scadenza-{{ $si }}-{{ $gi }}">
+                                            <label class="form-check-label" for="new-con-scadenza-{{ $si }}-{{ $gi }}">Con scadenza</label>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
 
                                 @if(($newElement[$si][$gi]['type'] ?? 'text') === 'select')

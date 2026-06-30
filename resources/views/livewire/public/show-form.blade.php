@@ -171,6 +171,7 @@
 
                                 @elseif($element->type === 'file')
                                     {{-- File Element --}}
+                                    @php $conScadenza = $element->configuration['con_scadenza'] ?? false; @endphp
                                     <div class="mb-2" style="font-size:.85rem;">
                                         @if($element->required) <span class="text-danger me-1">*</span> @endif
                                         {{ $element->label }}
@@ -180,22 +181,35 @@
                                             <thead>
                                                 <tr>
                                                     <th>File caricato</th>
-                                                    <th style="width:120px;">Scadenza</th>
-                                                    <th style="width:100px;">Elimina</th>
+                                                    @if($conScadenza) <th style="width:140px;">Scadenza</th> @endif
+                                                    <th style="width:100px;"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @forelse($element->objectRecords as $record)
                                                 <tr>
-                                                    <td colspan="3" class="text-muted text-center small">Nessun file caricato.</td>
+                                                    <td>{{ $record->data['file'] ?? '–' }}</td>
+                                                    @if($conScadenza) <td>{{ $record->data['scadenza'] ?? '–' }}</td> @endif
+                                                    <td class="text-nowrap">
+                                                        <button type="button" class="action-link-danger btn btn-link p-0"
+                                                                wire:click="deleteRecord({{ $record->id }})"
+                                                                wire:confirm="Eliminare questo file?">
+                                                            <i class="fa fa-times me-1"></i>Elimina
+                                                        </button>
+                                                    </td>
                                                 </tr>
+                                                @empty
+                                                <tr>
+                                                    <td colspan="{{ $conScadenza ? 3 : 2 }}" class="text-muted text-center small">Nessun file caricato.</td>
+                                                </tr>
+                                                @endforelse
                                             </tbody>
                                         </table>
                                     </div>
                                     <div>
-                                        <label class="btn btn-primary btn-sm mb-0" style="cursor:pointer;">
+                                        <button type="button" class="btn btn-primary btn-sm" wire:click="openModal({{ $element->id }})">
                                             <i class="fa fa-plus me-1"></i> Allega documento
-                                            <input type="file" class="d-none">
-                                        </label>
+                                        </button>
                                     </div>
 
                                 @elseif($element->type === 'checkbox')
@@ -276,41 +290,60 @@
                     <button type="button" class="btn-close btn-close-white" wire:click="closeModal" aria-label="Chiudi"></button>
                 </div>
                 <div class="modal-body modal-compact">
-                    @foreach($modalFields as $field)
-                    <div class="mb-3">
-                        <div class="modal-field-label">
-                            @if($field['required'] ?? false) <span class="text-danger me-1">*</span> @endif
-                            {{ $field['label'] }}
-                        </div>
-                        @if(($field['type'] ?? 'text') === 'textarea')
-                            <textarea class="form-control form-control-sm"
-                                      wire:model="modalData.{{ $field['name'] }}" rows="3"></textarea>
-                        @elseif(($field['type'] ?? 'text') === 'select')
-                            <div wire:ignore>
-                                <select class="form-select form-select-sm modal-ts-select"
-                                        id="ts-{{ $field['name'] }}"
-                                        data-livewire-field="{{ $field['name'] }}"
-                                        data-livewire-value="{{ $modalData[$field['name']] ?? '' }}">
-                                    <option value="">Seleziona...</option>
-                                    @foreach($field['options'] ?? [] as $opt)
-                                        <option value="{{ $opt }}" {{ ($modalData[$field['name']] ?? '') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @elseif(($field['type'] ?? 'text') === 'file')
+                    @if($modalEl && $modalEl->type === 'file')
+                        @php $modalConScadenza = $modalEl->configuration['con_scadenza'] ?? false; @endphp
+                        <div class="mb-3">
+                            <div class="modal-field-label">File</div>
                             <input type="file"
                                    class="form-control form-control-sm"
-                                   onchange="@this.set('modalData.{{ $field['name'] }}', this.files[0]?.name ?? '')">
-                            @if(!empty($modalData[$field['name']]))
-                                <div class="small text-muted mt-1">{{ $modalData[$field['name']] }}</div>
+                                   onchange="@this.set('modalData.file', this.files[0]?.name ?? '')">
+                            @if(!empty($modalData['file']))
+                                <div class="small text-muted mt-1">{{ $modalData['file'] }}</div>
                             @endif
-                        @else
-                            <input type="{{ $field['type'] ?? 'text' }}"
-                                   class="form-control form-control-sm"
-                                   wire:model="modalData.{{ $field['name'] }}">
+                        </div>
+                        @if($modalConScadenza)
+                        <div class="mb-3">
+                            <div class="modal-field-label">Scadenza</div>
+                            <input type="date" class="form-control form-control-sm" wire:model="modalData.scadenza">
+                        </div>
                         @endif
-                    </div>
-                    @endforeach
+                    @else
+                        @foreach($modalFields as $field)
+                        <div class="mb-3">
+                            <div class="modal-field-label">
+                                @if($field['required'] ?? false) <span class="text-danger me-1">*</span> @endif
+                                {{ $field['label'] }}
+                            </div>
+                            @if(($field['type'] ?? 'text') === 'textarea')
+                                <textarea class="form-control form-control-sm"
+                                          wire:model="modalData.{{ $field['name'] }}" rows="3"></textarea>
+                            @elseif(($field['type'] ?? 'text') === 'select')
+                                <div wire:ignore>
+                                    <select class="form-select form-select-sm modal-ts-select"
+                                            id="ts-{{ $field['name'] }}"
+                                            data-livewire-field="{{ $field['name'] }}"
+                                            data-livewire-value="{{ $modalData[$field['name']] ?? '' }}">
+                                        <option value="">Seleziona...</option>
+                                        @foreach($field['options'] ?? [] as $opt)
+                                            <option value="{{ $opt }}" {{ ($modalData[$field['name']] ?? '') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @elseif(($field['type'] ?? 'text') === 'file')
+                                <input type="file"
+                                       class="form-control form-control-sm"
+                                       onchange="@this.set('modalData.{{ $field['name'] }}', this.files[0]?.name ?? '')">
+                                @if(!empty($modalData[$field['name']]))
+                                    <div class="small text-muted mt-1">{{ $modalData[$field['name']] }}</div>
+                                @endif
+                            @else
+                                <input type="{{ $field['type'] ?? 'text' }}"
+                                       class="form-control form-control-sm"
+                                       wire:model="modalData.{{ $field['name'] }}">
+                            @endif
+                        </div>
+                        @endforeach
+                    @endif
                 </div>
                 <div class="modal-footer modal-compact">
                     <button type="button" class="btn btn-primary btn-sm" wire:click="saveRecord">

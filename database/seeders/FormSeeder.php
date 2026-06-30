@@ -45,17 +45,12 @@ class FormSeeder extends Seeder
         Element::create([
             'group_id'      => $grpF1d->id,
             'name'          => 'documento_di_riconoscimento',
-            'type'          => 'object',
+            'type'          => 'file',
             'label'         => 'Documento di riconoscimento',
             'placeholder'   => null,
             'required'      => true,
             'order'         => 0,
-            'configuration' => [
-                'fields' => [
-                    ['name' => 'file',     'label' => 'File',     'type' => 'file', 'required' => true],
-                    ['name' => 'scadenza', 'label' => 'Scadenza', 'type' => 'date', 'required' => false],
-                ],
-            ],
+            'configuration' => ['con_scadenza' => true],
         ]);
         Element::create(['group_id' => $grpF1d->id, 'name' => 'curriculum_vitae', 'type' => 'file', 'label' => 'Curriculum Vitae', 'placeholder' => null, 'required' => false, 'order' => 1, 'configuration' => null]);
 
@@ -190,17 +185,12 @@ class FormSeeder extends Seeder
         Element::create([
             'group_id'      => $grpF3h->id,
             'name'          => 'capacita_economico_finanziaria',
-            'type'          => 'object',
+            'type'          => 'file',
             'label'         => 'Capacità economico finanziaria',
             'placeholder'   => null,
             'required'      => false,
             'order'         => 0,
-            'configuration' => [
-                'fields' => [
-                    ['name' => 'file',     'label' => 'File',     'type' => 'file', 'required' => false],
-                    ['name' => 'scadenza', 'label' => 'Scadenza', 'type' => 'date', 'required' => false],
-                ],
-            ],
+            'configuration' => ['con_scadenza' => true],
         ]);
 
         $grpF3i = Group::create(['step_id' => $stepF3->id, 'title' => 'Iscrizione alla "White List" per le imprese che operano nei settori a rischio di infiltrazioni mafiose', 'header' => 'La legge n. 190 del 6 novembre 2012 e d.P.C.M. del 18 aprile 2013, pubblicato in G.U. del 15 luglio 2013 n. 163, ha introdotto, presso le Prefetture, particolari liste denominate "White List", nelle quali possono chiedere l\'iscrizione le imprese che operano nei settori esposti a rischio di infiltrazione mafiosa. L\'iscrizione nelle White List costituisce requisito obbligatorio per la partecipazione ad appalti nei settori a rischio. La partecipazione è preclusa alle imprese che non abbiano la possibilità concreta di assumere il collegamento con la Prefettura di competenza.', 'footer' => null, 'order' => 8]);
@@ -614,17 +604,12 @@ class FormSeeder extends Seeder
         Element::create([
             'group_id'      => $grp5d5->id,
             'name'          => 'ulteriore_documentazione',
-            'type'          => 'object',
+            'type'          => 'file',
             'label'         => 'Ulteriore documentazione',
             'placeholder'   => null,
             'required'      => false,
             'order'         => 0,
-            'configuration' => [
-                'fields' => [
-                    ['name' => 'file',     'label' => 'File',     'type' => 'file', 'required' => false],
-                    ['name' => 'scadenza', 'label' => 'Scadenza', 'type' => 'date', 'required' => false],
-                ],
-            ],
+            'configuration' => ['con_scadenza' => true],
         ]);
 
         $grp5d6 = Group::create(['step_id' => $step5d->id, 'title' => 'Documentazione integrativa', 'header' => 'Di seguito è possibile allegare eventuali documenti integrativi alla scheda di iscrizione.', 'footer' => null, 'order' => 5]);

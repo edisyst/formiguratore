@@ -214,6 +214,8 @@ class FormBuilder extends Component
             $config['options'] = ['-', 'SI', 'NO'];
         } elseif ($type === 'object') {
             $config['fields'] = $data['object_fields'] ?? [];
+        } elseif ($type === 'file') {
+            $config['con_scadenza'] = isset($data['file_con_scadenza']) && $data['file_con_scadenza'];
         }
 
         $this->steps[$si]['groups'][$gi]['elements'][] = [
